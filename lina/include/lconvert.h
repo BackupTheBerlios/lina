@@ -27,11 +27,10 @@
 ///Converts a string into a digit(int ...).
 template<class T>
 inline bool LStringToDigit(T &t,
-                           const std::string &s,
-                           std::ios & (*f)(std::ios&)=std::dec)
+                           const std::string &s)
 {
   std::istringstream iss(s);
-  return !(iss>>f>>t).fail();
+  return !(iss>>std::dec>>t).fail();
 }
 
 ///Converts a digit(int...) into a string.
