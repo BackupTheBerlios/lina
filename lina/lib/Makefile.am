@@ -6,4 +6,5 @@ lib_LIBRARIES = liblina.a
 
 
 
-liblina_a_SOURCES = ldatabase.cpp lcalendar.cpp lutility.cpp lmatch.cpp lstadium.cpp lfootballstadium.cpp lconvert.cpp lmetrics.cpp lcompetition.cpp
+liblina_a_SOURCES = ldatabase.cpp lcalendar.cpp lutility.cpp lmatch.cpp lstadium.cpp lfootballstadium.cpp lconvert.cpp lmetrics.cpp lcompetition.cpp lstats.cpp lserver.cpp lclient.cpp
+SUBDIRS =  netxx

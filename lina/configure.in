@@ -21,4 +21,4 @@ if test "$enable_qldb" = "yes"; then
 fi
 
 
-AC_OUTPUT(Makefile src/Makefile src/tests/Makefile lib/Makefile src/tools/Makefile src/tools/qldb/Makefile include/Makefile src/tools/template_gen/Makefile)
+AC_OUTPUT(Makefile src/Makefile src/tests/Makefile lib/Makefile src/tools/Makefile src/tools/qldb/Makefile include/Makefile src/tools/template_gen/Makefile src/tests/stadiumtest/Makefile lib/netxx/Makefile include/netxx/Makefile include/netxx/tls/Makefile)

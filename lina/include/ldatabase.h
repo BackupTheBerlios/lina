@@ -126,6 +126,10 @@ public:
   /** Read the key's array size from the database.*/
   int ReadArraySize(const LID& lid, const std::string& key) const;
 
+  /// Read the plain text of all database-files related to this LID
+  /** This method is thought for debugging issues.*/
+  void ReadPlainText(const LID& lid, std::string& text) const;
+  
   /// Erase a key from a LID.
   /** Erases a key completly in a certain LID.*/
   void Erase(const LID& lid, const std::string& key) const;
@@ -172,6 +176,9 @@ public:
 
   /// Remove a database root.
   void RemoveRoot(const std::string& db_root);
+  
+  /// Remove a database root.
+  void RemoveRoot(LDBPrio prio);
 
   /// Create a new database root.
   /** Returns false if it failes. */

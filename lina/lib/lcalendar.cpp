@@ -95,6 +95,9 @@ LTime::LTime(int year, int month, int day, int hour, int minute, int second) : s
 LTime::LTime(int year, int month, int day) : seconds(0), julian(0)
 {
   SetYMD( year, month, day );
+  
+  asdf = 1;
+  asdf.numerator();
 }
 
 /*LTime::LTime(int year, int week, int weekday) : seconds(0), julian(0)

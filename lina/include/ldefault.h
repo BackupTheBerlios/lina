@@ -26,6 +26,8 @@
 #include <lcalendar.h>
 #include <lstadium.h>
 #include <lfootballstadium.h>
+#include <lcompetition.h>
+#include <lstats.h>
 
 LDatabase& LDB = LDatabase::Get();
 

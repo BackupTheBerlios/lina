@@ -7,6 +7,7 @@
 ** place of a destructor.
 *****************************************************************************/
 
+#include <qtextedit.h>
 #include <qfiledialog.h>
 #include <qinputdialog.h>
 #include <qstring.h>
@@ -86,7 +87,7 @@ void QLDB::open_LID( QListViewItem* item )
     for(set<string>::iterator it = keys.begin(); it != keys.end(); ++it,++i)
     {
       //insert the key into the table
-      table->setItem( i, 0, new QTableItem( table, QTableItem::WhenCurrent, (*it).c_str() ));
+      table->setItem( i, 0, new QTableItem( table, QTableItem::OnTyping, (*it).c_str() ));
 
       //read the key's value array and assign it to value_vector
       vector<string> value_vector;
@@ -100,7 +101,7 @@ void QLDB::open_LID( QListViewItem* item )
           table->insertColumns(table->numCols());
         }
         //insert the value into the table
-        table->setItem( i, y, new QTableItem( table, QTableItem::WhenCurrent, (*s_it).c_str() ));
+        table->setItem( i, y, new QTableItem( table, QTableItem::OnTyping, (*s_it).c_str() ));
       }
 
       table->adjustRow(i);
@@ -253,7 +254,7 @@ void QLDB::import_template()
     for(set<string>::iterator it = keys.begin(); it != keys.end(); ++it,++i)
     {
       //insert the key into the table
-      table->setItem( i, 0, new QTableItem( table, QTableItem::WhenCurrent, (*it).c_str() ));
+      table->setItem( i, 0, new QTableItem( table, QTableItem::OnTyping, (*it).c_str() ));
 
       //read the key's value array and assign it to value_vector
       vector<string> value_vector;
@@ -267,7 +268,7 @@ void QLDB::import_template()
           table->insertColumns(table->numCols());
         }
         //insert the value into the table
-        table->setItem( i, y, new QTableItem( table, QTableItem::WhenCurrent, (*s_it).c_str() ));
+        table->setItem( i, y, new QTableItem( table, QTableItem::OnTyping, (*s_it).c_str() ));
       }
 
       table->adjustRow(i);
@@ -278,4 +279,24 @@ void QLDB::import_template()
     }
    }
   }
+}
+
+
+void QLDB::show_source()
+{
+if(current_LID)
+{
+ string source;
+ LDB.ReadPlainText(*current_LID,source);
+ QDialog source_viewer(this,"Show source");
+ QTextEdit source_textedit(&source_viewer,"hmm");
+ source_textedit.setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+ source_textedit.setWordWrap(QTextEdit::NoWrap);
+ source_viewer.setGeometry(200,200,500,400);
+ source_viewer.setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+ source_textedit.setGeometry(0,0,500,400);
+ source_textedit.setText(source);
+ source_textedit.setReadOnly(true);
+ source_viewer.exec();
+ }
 }

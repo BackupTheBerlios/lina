@@ -46,12 +46,10 @@ std::istream& operator>>(std::istream& is, LID& rv)
 }
 
 LID::LID(const string& lid_catalog, const string& lid_token) : catalog(lid_catalog),token(lid_token)
-{
-}
+{}
 
 LID::LID(const LID& lid) : catalog(lid.catalog),token(lid.token)
-{
-}
+{}
 
 LDatabase& LDatabase::Get()
 {
@@ -87,6 +85,18 @@ void LDatabase::RemoveRoot(const string& db_root)
   for(LDBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
   {
     if( (*it).first == db_root )
+    {
+      //Remove the database root
+      root_prio_set.erase(it);
+    }
+  }
+}
+
+void LDatabase::RemoveRoot(LDBPrio prio)
+{
+  for(LDBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
+  {
+    if( (*it).second == prio )
     {
       //Remove the database root
       root_prio_set.erase(it);
@@ -282,7 +292,7 @@ int LDatabase::ReadArraySize(const LID& lid,const string& key) const
 
   int i=0;
   int pos=0;
-  //split it with '|' and push the parts to value_vector
+  //split it with '|'
   while((pos = value.find('|',pos)) != string::npos)
   {
     pos+=1;
@@ -327,6 +337,23 @@ int LDatabase::GetKeys(const LID& lid, set<string>& key_set) const
     return keys;
   }
 
+void LDatabase::ReadPlainText(const LID& lid, std::string& text) const
+{
+  LIDInfo lid_info = GetLIDInfo(lid);
+  for( LDBPairSet::iterator it = lid_info.root_prio_set.begin(); it != lid_info.root_prio_set.end(); ++it )
+  {
+    gzFile file = gzopen((((*it).first+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"rb");
+
+    const short int MAXLINESIZE = 1024;
+
+    for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != '\0' ; )
+    {
+      text += tmpline;
+    }
+    gzclose(file);
+  }
+}
+
 void LDatabase::Erase(const LID& lid,const string& key) const
 {
 
@@ -341,9 +368,17 @@ void LDatabase::Erase(const LID& lid,const string& key) const
     string line;
     string data;
     bool multiline = false;
+    bool clean = false;
     for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != '\0' ; )
     {
       line=tmpline;
+      if(!clean)
+      {
+        if(line.find(":") == string::npos)
+          continue;
+        else
+          clean = true;
+      }
       if(line.find(key+":") == 0 || multiline)
       {
         if(line[line.length()-3] != '\\' && line[line.length()-2] == '\\')

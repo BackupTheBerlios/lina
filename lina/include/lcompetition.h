@@ -20,38 +20,49 @@
 
 #ifndef LCOMPETITION_H
 #define LCOMPETITION_H
- 
+
 #include <ldatabase.h>
 
-/// Base class for competitions 
+/// Base class for competitions
 class LCompetition : public LDatabaseInterface
 {
 public:
-LCompetition(const LID& lid) : LDatabaseInterface(lid) {}
+  LCompetition(const LID& lid) : LDatabaseInterface(lid) {}
+  virtual void Save() const {};
+  unsigned int Participants() const
+  {
+    return participants.size();
+  };
+  virtual void AddParticipant(const LID& lid)
+  {
+    participants.insert(lid);
+  };
 
 private:
-std::set<LID> participants;
+  std::set
+    <LID> participants;
 };
 
 class LCompetitionManager : public LDatabaseInterface
 {
 public:
-LCompetitionManager(const LID& lid) : LDatabaseInterface(lid) {}
+  LCompetitionManager(const LID& lid) : LDatabaseInterface(lid) {}
 
 private:
-std::set<LID> competitions;
+  std::set
+    <LID> competitions;
 };
 
-class LLeague : LCompetition
+class LLeague : public LCompetition
 {
 public:
-LLeague(const LID& lid) : LCompetition(lid) {}
+  LLeague(const LID& lid) : LCompetition(lid) {};
 };
 
-class LCup : LCompetition
+class LCup : public LCompetition
 {
 public:
-LCup(const LID& lid) : LCompetition(lid) {}
+  LCup(const LID& lid) : LCompetition(lid) {};
 };
 
 #endif //LCOMPETITION_H

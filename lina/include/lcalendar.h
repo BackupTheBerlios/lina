@@ -21,6 +21,7 @@
 #ifndef LCALENDAR_H
 #define LCALENDAR_H
 
+#include <boost/rational.hpp>
 #include <time.h>
 #include <string>
 #include <ldatabase.h>
@@ -136,6 +137,8 @@ private:
   unsigned long julian;
   // seconds (in one day)
   unsigned long seconds;
+  
+  boost::rational<int> asdf;
 };
 
 /// Represents a time period.
@@ -212,6 +215,7 @@ public:
 
 enum EventStatusEnum { EventNotStarted, EventStart, EventOngoing, EventEnd, EventFinished};
 
+/// Controls events.
 class LCalendar : public LDatabaseInterface
 {
 public:

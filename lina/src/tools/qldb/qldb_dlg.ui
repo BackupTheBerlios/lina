@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>708</width>
-            <height>493</height>
+            <width>791</width>
+            <height>497</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -127,6 +127,9 @@
             <property name="name">
                 <cstring>table</cstring>
             </property>
+            <property name="acceptDrops">
+                <bool>true</bool>
+            </property>
             <property name="numRows">
                 <number>0</number>
             </property>
@@ -188,6 +191,22 @@
                 </size>
             </property>
         </spacer>
+        <widget class="QPushButton" row="2" column="4">
+            <property name="name">
+                <cstring>show_source_button</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>0</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="text">
+                <string>Show source</string>
+            </property>
+        </widget>
     </grid>
 </widget>
 <connections>
@@ -245,6 +264,12 @@
         <receiver>qldb</receiver>
         <slot>import_template()</slot>
     </connection>
+    <connection>
+        <sender>show_source_button</sender>
+        <signal>clicked()</signal>
+        <receiver>qldb</receiver>
+        <slot>show_source()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="local" impldecl="in implementation">qldb_dlg.ui.h</include>
@@ -259,6 +284,7 @@
     <slot specifier="non virtual">add_key_row()</slot>
     <slot specifier="non virtual">add_value_column()</slot>
     <slot>import_template()</slot>
+    <slot>show_source()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
