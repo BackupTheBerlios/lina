@@ -30,14 +30,14 @@
 #include <time.h>
 #include <math.h>
 
+namespace LINA {
+
 /// The Mersenne Twister is an algorithm for generating random numbers.
 /** It was designed with consideration of the flaws in various other generators.
     The period, 2^19937-1, and the order of equidistribution, 623 dimensions,
     are far greater.  The generator is also fast; it avoids multiplication and
     division, and it benefits from caches and pipelines.  For more information
     see the inventors' web page at http://www.math.keio.ac.jp/~matumoto/emt.html */
-
-namespace LINA {
 
 class Random {
 // Data
