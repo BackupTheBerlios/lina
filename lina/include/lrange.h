@@ -23,35 +23,56 @@
 
 #include <iostream>
 
+/// LINA Range
+/** This class provides a type of your choice
+    with the possibility to define its range. */
 template <class T=char,int min=0,int max=100>
 class LRange
 {
+    /// operators << and >>
+    /** Makes `cout' and `cin' operations
+        possible with LRange. */
     friend std::ostream &operator<<<T,min,max>(std::ostream&, const LRange<T,min,max>&);
     friend std::istream &operator>><T,min,max>(std::istream& is, LRange&);
+
+    // operators for standard calculation
     friend LRange operator+<T,min,max>(const LRange&, const LRange&);
     friend LRange operator-<T,min,max>(const LRange&, const LRange&);
     friend LRange operator*<T,min,max>(const LRange&, const LRange&);
     friend LRange operator/<T,min,max>(const LRange&, const LRange&);
 
     private:
+      /// The value itself - isn't it sweet?
       T value;
 
     public:
+      /// default constructor
       LRange();
+
+      // other constructors
       LRange(long);
       LRange(const LRange &rv): value(rv.value) {};
+
+      /// destructor
       ~LRange();
+
+      // assignmet operators
       LRange &operator= (const LRange&);
       LRange &operator+= (const LRange&);
       LRange &operator-= (const LRange&);
       LRange &operator*= (const LRange&);
       LRange &operator/= (const LRange&);
+
+      // boolean operators
       bool operator< (const LRange&);
       bool operator> (const LRange&);
       bool operator== (const LRange&);
       bool operator!= (const LRange&);
       bool operator<= (const LRange&);
       bool operator>= (const LRange&);
+
+      // Possibility to return an integer
+      // where no integer value is given.
       operator int() { return value; }
 };
 
