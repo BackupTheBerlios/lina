@@ -23,10 +23,11 @@
 
 #include <iostream>
 
-template <class T,int min=0,int max=100>
+template <class T=char,int min=0,int max=100>
 class LRange
 {
     friend std::ostream &operator<<<T,min,max>(std::ostream&, const LRange<T,min,max>&);
+    friend std::istream &operator>><T,min,max>(std::istream& is, LRange&);
     friend LRange operator+<T,min,max>(const LRange&, const LRange&);
     friend LRange operator-<T,min,max>(const LRange&, const LRange&);
     friend LRange operator*<T,min,max>(const LRange&, const LRange&);
@@ -53,6 +54,8 @@ class LRange
       bool operator>= (const LRange&);
       operator int() { return value; }
 };
+
+typedef LRange<char> LRangeC;
 
 #include "../lib/lrange.cpp"
 

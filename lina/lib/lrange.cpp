@@ -123,6 +123,12 @@ template<class T,int min,int max> std::ostream& operator<<(std::ostream& ostr, c
     return ostr;
 }
 
+template<class T,int min,int max> std::istream& operator>>(std::istream& is, LRange<T,min,max>& rv)
+{
+  is >> rv.value;
+  return is;
+}
+
 template<class T,int min,int max> LRange<T,min,max> operator+(const LRange<T,min,max> &rv1, const LRange<T,min,max> &rv2)
 {
     return rv1.value + rv2.value;
