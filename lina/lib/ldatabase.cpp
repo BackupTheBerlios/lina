@@ -59,7 +59,7 @@ bool LDatabase::CreateRoot(const string& db_root, LDBPrio db_prio)
   {
     //create the priority file
     ofstream file;
-    file.open(((db_root+"/prio").c_str()),ios_base::out);
+    file.open(((db_root+"/prio").c_str()),ios::out);
     if(file.is_open())
     {
       file.put(db_prio+48);
