@@ -409,3 +409,11 @@ LDatabase::LIDInfo LDatabase::GetLIDInfo(const LID& lid) const
   }
   return lid_info;
 }
+
+void LDatabaseInterface::MakeLazy(void* address)
+{
+if(lazy_members.find(address) == lazy_members.end())
+{
+lazy_members.insert(address);
+}
+}
