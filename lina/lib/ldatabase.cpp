@@ -20,8 +20,15 @@
 
 #include <ldatabase.h>
 
+using namespace std;
+
+LDatabase& LDatabaseInterface::LDB = LDatabase::Get();
+
 bool operator<(const LDBPair& lhs, const LDBPair& rhs) { return ( lhs.second > rhs.second); };
 bool operator>(const LDBPair& lhs, const LDBPair& rhs) { return ( lhs.second < rhs.second); };
+
+bool operator<(const LID& lhs, const LID& rhs) { return ( lhs.Catalog()+lhs.Token() > rhs.Catalog()+rhs.Token()); };
+bool operator>(const LID& lhs, const LID& rhs) { return ( lhs.Catalog()+lhs.Token() < rhs.Catalog()+rhs.Token()); };
 
 bool operator==(const LID& lhs, const LID& rhs)
 {
@@ -29,15 +36,20 @@ bool operator==(const LID& lhs, const LID& rhs)
 }
 
 LID::LID(const string& lid_catalog, const string& lid_token) : catalog(lid_catalog),token(lid_token)
+{}
+
+LDatabase& LDatabase::Get()
 {
+  static LDatabase instance;
+  return instance;
 }
 
 bool LDatabase::AddRoot(const string& db_root)
 {
   ifstream file;
-  //open the root-root file
+  //open the root-prio file
   file.open(((db_root+"/prio").c_str()));
-  //to have "/" as root would not be a good idea
+  //to have "/" as database root would not be a good idea
   if(db_root != "/" && file.is_open() )
   {
     //get the priority of this root
@@ -52,9 +64,27 @@ bool LDatabase::AddRoot(const string& db_root)
     return false;
 }
 
+void LDatabase::RemoveRoot(const string& db_root)
+{
+  for(LDBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
+  {
+    if( (*it).first == db_root )
+    {
+      //Remove the database root
+      root_prio_set.erase(it);
+    }
+  }
+}
+
+void LDatabase::Clear()
+{
+  //erase all data of root_prio_set
+  root_prio_set.erase(root_prio_set.begin(),root_prio_set.end());
+}
+
 bool LDatabase::CreateRoot(const string& db_root, LDBPrio db_prio)
 {
-  //"/" as root is no good idea
+  //"/" as database root is no good idea
   if(db_root == "/")
     return false;
   //create directory for the new root
@@ -74,16 +104,17 @@ bool LDatabase::CreateRoot(const string& db_root, LDBPrio db_prio)
   else
   {
     printf("mkdir returned errno: %#s\n", strerror(errno));
+    return false;
   }
 }
 
 const string LDatabase::Read(const LID& lid,const string& key) const
 {
-  string root;
-  //we want to read the LID in the
-  if ( (root = FindTopPriorityRoot(lid)).length() )
+
+  LIDInfo lid_info = GetLIDInfo(lid);
+  for( LDBPairSet::iterator it = lid_info.root_prio_set.begin(); it != lid_info.root_prio_set.end(); ++it )
   {
-    gzFile file = gzopen(((root+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"rb");
+    gzFile file = gzopen((((*it).first+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"rb");
 
     const short int MAXLINESIZE = 1024;
 
@@ -142,54 +173,53 @@ int LDatabase::ReadArray(const LID& lid,const string& key,vector<string>& value_
   }
 }
 
-int LDatabase::GetKeys(const LID& lid, vector<string>& key_vector) const
-{
-  string root;
-  int keys=0;
-  if ( (root = FindTopPriorityRoot(lid)).length() )
+int LDatabase::GetKeys(const LID& lid, set<string>& key_set) const
   {
-    gzFile file = gzopen(((root+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"rb");
-
-    const short int MAXLINESIZE = 1024;
-
-    // write file contents to cout
-    string line;
-    string data;
-    bool multiline = false;
-
-    for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != '\0' ; )
+    int keys=0;
+    LIDInfo lid_info = GetLIDInfo(lid);
+    for( LDBPairSet::iterator it = lid_info.root_prio_set.begin(); it != lid_info.root_prio_set.end(); ++it )
     {
-      line=tmpline;
-      string::size_type pos = line.find(":",0);
-      if(line[0] != '#' && (multiline || (pos != string::npos && (line[pos-1] != '\\' || line[pos-2] == '\\'))))
+      gzFile file = gzopen((((*it).first+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"rb");
+
+      const short int MAXLINESIZE = 1024;
+
+      string line;
+      string data;
+      bool multiline = false;
+      for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != '\0' ; )
       {
-        if(multiline == false)
+        line=tmpline;
+        string::size_type pos = line.find(":",0);
+        if(line[0] != '#' && (multiline || (pos != string::npos && (line[pos-1] != '\\' || line[pos-2] == '\\'))))
         {
-          key_vector.push_back(line.substr(0,pos));
-          ++keys;
+          if(multiline == false)
+          {
+            key_set.insert(line.substr(0,pos));
+            ++keys;
+          }
+          if(line[line.length()-3] != '\\' && line[line.length()-2] == '\\')
+            multiline = true;
+          else
+            multiline = false;
         }
-        if(line[line.length()-3] != '\\' && line[line.length()-2] == '\\')
-          multiline = true;
-        else
-          multiline = false;
       }
+
+      gzclose(file);
     }
-
-    gzclose(file);
+    return keys;
   }
-  return keys;
-}
 
-bool LDatabase::Erase(const LID& lid,const string& key) const
+void LDatabase::Erase(const LID& lid,const string& key) const
 {
-  string root;
-  if ( (root = FindTopPriorityRoot(lid)) != "" )
+
+  LDBPairSet::iterator it = root_prio_set.find(LDBPair("",write_flag));
+  if ( it != root_prio_set.end() )
   {
-    gzFile file = gzopen(((root+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"rb");
+
+    gzFile file = gzopen((((*it).first+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"rb");
 
     const short int MAXLINESIZE = 1024;
 
-    // write file contents to cout
     string line;
     string data;
     bool multiline = false;
@@ -212,7 +242,7 @@ bool LDatabase::Erase(const LID& lid,const string& key) const
 
     if(data.length())
     {
-      file = gzopen(((root+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"w");
+      file = gzopen((((*it).first+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"w");
       gzwrite(file, const_cast<char*>(data.c_str()), data.length()-1);
       gzclose(file);
     }
@@ -220,40 +250,29 @@ bool LDatabase::Erase(const LID& lid,const string& key) const
   }
 }
 
-bool LDatabase::Write(const LID& lid, const string& key, const string& value) const
+void LDatabase::Write(const LID& lid, const string& key, const string& value) const
 {
   //erase the current appearances of key
   Erase(lid,key);
 
-  string root;
-  if ( (root = FindTopPriorityRoot(lid)) != "" )
+  LDBPairSet::iterator it = root_prio_set.find(LDBPair("",write_flag));
+  if ( it != root_prio_set.end() )
   {
     //open the file for appending
-    gzFile file = gzopen(((root+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"ab");
+    gzFile file = gzopen((((*it).first+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"ab");
     //create data and write it to the filestream
     string data = '\n' + key + ':' + value + '\n';
-    gzwrite(file, const_cast<char*>(data.c_str()), data.length()-1);
+    gzwrite(file, const_cast<char*>(data.c_str()), data.length());
     //close
     gzclose(file);
   }
 }
 
-bool LDatabase::WriteArray(const LID& lid, const string& key, const vector<string>& value_vector) const
-{
-  string value;
-  for(vector<string>::const_iterator it = value_vector.begin(); it != value_vector.end(); ++it)
-  {
-    value += (*it) + '|';
-  }
-  Write(lid,key,value);
-}
-
-int LDatabase::IterateLIDs(const string& lid_catalog, vector<LID>& lid_vector)
+int LDatabase::IterateLIDs(const string& lid_catalog, set<LID>& lid_set)
 {
   DIR   *dirStructP;
   dirent   *direntp;
 
-  set<LID,LID::LIDComp> lid_set;
   int lids=0;
   for(LDBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
   {
@@ -274,46 +293,38 @@ int LDatabase::IterateLIDs(const string& lid_catalog, vector<LID>& lid_vector)
       printf("opendir returned errno: %#x\n", errno);
     }
   }
-  for(set<LID,LID::LIDComp>::iterator it = lid_set.begin(); it != lid_set.end(); ++it)
-  {
-    lid_vector.push_back((*it));
-  }
   return lids;
 }
 
-int LDatabase::FindLIDs(const string& lid_catalog,const string& key,const string& value, vector<LID>& lid_vector)
+int LDatabase::FindLIDs(const string& lid_catalog,const string& key,const string& value, set<LID>& lid_set)
 {
   DIR   *dirStructP;
   dirent   *direntp;
 
-  set<LID,LID::LIDComp> lid_set;
   int lids=0;
   for(LDBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
   {
-  if((dirStructP = opendir(((*it).first+"/"+lid_catalog).c_str())) != NULL)
-  {
-    while((direntp = readdir(dirStructP)) != NULL)
+    if((dirStructP = opendir(((*it).first+"/"+lid_catalog).c_str())) != NULL)
     {
-      if ( direntp->d_type == DT_REG )
+      while((direntp = readdir(dirStructP)) != NULL)
       {
-        if ( Read(LID(lid_catalog,direntp->d_name),key) == value )
+        if ( direntp->d_type == DT_REG )
         {
-          lid_set.insert(LID(lid_catalog,direntp->d_name));
-          ++lids;
+          if ( Read(LID(lid_catalog,direntp->d_name),key) == value )
+          {
+            lid_set.insert(LID(lid_catalog,direntp->d_name));
+            ++lids;
+          }
         }
       }
+      closedir(dirStructP);
     }
-    closedir(dirStructP);
+    else
+    {
+      printf("opendir returned errno: %#x\n", errno);
+    }
   }
-  else
-  {
-    printf("opendir returned errno: %#x\n", errno);
-  }
-  }
-  for(set<LID,LID::LIDComp>::iterator it = lid_set.begin(); it != lid_set.end(); ++it)
-  {
-    lid_vector.push_back((*it));
-  }
+
   return lids;
 }
 
@@ -386,9 +397,9 @@ void LDatabase::Clean(const LID& lid) const
 
 }
 
-LDatabase::LID_info LDatabase::GetLIDInfo(const LID& lid)
+LDatabase::LIDInfo LDatabase::GetLIDInfo(const LID& lid) const
 {
-  LID_info lid_info;
+  LIDInfo lid_info;
   for(LDBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
   {
     if( Fexists((*it).first+"/"+lid.Catalog()+"/"+lid.Token()) )

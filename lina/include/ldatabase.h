@@ -28,12 +28,11 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <set>
 #include <cstdio>
 #include <cerrno>
-
-using namespace std;
 
 /// LINA ID
 /** This class stores a unique ID,
@@ -42,19 +41,11 @@ class LID
 {
 public:
   /// Constructor
-  LID(const string& lid_catalog, const string& lid_token);
+  LID(const std::string& lid_catalog, const std::string& lid_token);
 
-  const string ID() const { return catalog+token; };
-  const string Catalog() const { return catalog; };
-  const string Token() const { return token; };
-
-  struct LIDComp
-  {
-   bool operator()(const LID& lhs, const LID& rhs)
-   {
-   return (lhs.Catalog()+lhs.Token() > rhs.Catalog()+rhs.Token());
-   }
-  };
+  const std::string ID() const { return catalog+token; };
+  const std::string Catalog() const { return catalog; };
+  const std::string Token() const { return token; };
 
 private:
   // Constructor without arguments
@@ -62,8 +53,8 @@ private:
   // when it is declared.
   LID();
 
-  string catalog;
-  string token;
+  std::string catalog;
+  std::string token;
 };
 
 
@@ -77,15 +68,15 @@ enum LDBPrio{low,mid,high};
 /// Pair for a database root and its priority.
 struct LDBPair
 {
-LDBPair(const string& p_first, const LDBPrio& p_second) : first(p_first),second(p_second) {};
-string first;
-LDBPrio second;
-friend bool operator<(const LDBPair& lhs, const LDBPair& rhs);
-friend bool operator>(const LDBPair& lhs, const LDBPair& rhs);
+  LDBPair(const std::string& p_first, const LDBPrio& p_second) : first(p_first),second(p_second) {};
+  std::string first;
+  LDBPrio second;
+  friend bool operator<(const LDBPair& lhs, const LDBPair& rhs);
+  friend bool operator>(const LDBPair& lhs, const LDBPair& rhs);
 };
 
 /// Set of LDBPair.
-typedef set<LDBPair> LDBPairSet;
+typedef std::set<LDBPair> LDBPairSet;
 
 /// LINA Database
 /** This object can do several actions with a database,
@@ -93,81 +84,195 @@ typedef set<LDBPair> LDBPairSet;
 class LDatabase
 {
 public:
-  /// Default constructor.
-  LDatabase() {};
-  /// Constructor with initialization.
-  /** This constructor is initialized with a LDBPairSet,
-  which contains the roots and priorities.*/
-  LDatabase(const LDBPairSet& init_root_prio_set):root_prio_set(init_root_prio_set) {};
+  static LDatabase& Get();
 
   /// Read value from LID of the database.
   /** Read the key's value from the database.*/
-  const string Read(const LID& lid, const string& key) const;
+  const std::string Read(const LID& lid, const std::string& key) const;
 
   /// Read value from LID of the database.
   /** Read the key's value from the database.*/
-  int ReadArray(const LID& lid, const string& key, vector<string>& value_vector) const;
+  int ReadArray(const LID& lid, const std::string& key, std::vector<std::string>& value_vector) const;
 
   /// Erase a key from a LID.
   /** Erases a key completly in a certain LID.*/
-  bool Erase(const LID& lid, const string& key) const;
+  void Erase(const LID& lid, const std::string& key) const;
 
   /// Write values to a LID of the database.
-  /** Write the key and value to the database.
-      Returns true if success.*/
-  bool Write(const LID& lid, const string& key, const string& value) const;
+  /** Write the key and value to the database.*/
+  void Write(const LID& lid, const std::string& key, const std::string& value) const;
 
   /// Write values to a LID of the database.
-  /** Write the key and value to the database.
-      Returns true if success.*/
-  bool WriteArray(const LID& lid, const string& key, const vector<string>& value_vector) const;
+  /** Write the key and value to the database.*/
+  template<class IT>
+  void WriteArray(const LID& lid, const std::string& key, IT begin, const IT end) const
+  {
+    std::string value;
+    while(begin!=end)
+    {
+      value += (*begin) + '|';
+      begin++;
+    }
+    Write(lid,key,value);
+  }
 
-//  forkLID(const LID& lid, LDBPrio from, LDBPrio to=high) const;
+  /// Write values to a LID of the database.
+  /** Write the key and value to the database.*/
+  template<class Cont>
+  void WriteArray(const LID& lid, const std::string& key, const Cont& cont) const { WriteArray(lid,key,cont.begin(),cont.end()); }
+
+  //  forkLID(const LID& lid, LDBPrio from, LDBPrio to=high) const;
 
   /// Get all keys in a LID
-  /** Gets all keys and pushes them into key_vector.
+  /** Gets all keys and pushs them into key_set.
       Returns the number of keys.*/
-  int GetKeys(const LID& lid, vector<string>& key_vector) const;
+  int GetKeys(const LID& lid, std::set<std::string>& key_set) const;
 
   /// Iterates through the LIDs.
-  /** Fills a vector<LID> with all LIDs in a catalog*/
-  int IterateLIDs(const string& lid_catalog, vector<LID>& lid_vector);
+  /** Fills a set<LID> with all LIDs in a catalog*/
+  int IterateLIDs(const std::string& lid_catalog, std::set<LID>& lid_set);
 
   /// Find LIDs.
-  /** Fills a vector<LID> with all LIDs,
+  /** Fills a set<LID> with all LIDs,
       that have the right key and value.*/
-  int FindLIDs(const string& lid_catalog,const string& key,const string& value, vector<LID>& lid_vector);
+  int FindLIDs(const std::string& lid_catalog,const std::string& key,const std::string& value, std::set<LID>& lid_set);
 
   /// Add a database root.
   /** Returns false if the database root is invalid. */
-  bool AddRoot(const string& db_root);
+  bool AddRoot(const std::string& db_root);
+
+  /// Remove a database root.
+  void RemoveRoot(const std::string& db_root);
 
   /// Create a new database root.
   /** Returns false if it failes. */
-  bool CreateRoot(const string& db_root,enum LDBPrio=low);
+  bool CreateRoot(const std::string& db_root,enum LDBPrio=low);
+
+  /// Clear the database roots
+  void Clear();
+
+  /// Set write_flag
+  /** The write_flag defines to which database priority
+      data may be written currently.*/
+  void SetWriteFlag(enum LDBPrio prio=high) { write_flag=prio; };
 
   /// Information about a LID.
   /** Contains information about a LID.*/
-  struct LID_info
+  struct LIDInfo
   {
-  /// This LDBPairSet contains the roots and priorities,
-  /// where a LID is found in the database.
-  LDBPairSet root_prio_set;
+    /// This LDBPairSet contains the roots and priorities,
+    /// where a LID is found in the database.
+    LDBPairSet root_prio_set;
   };
 
-  LID_info GetLIDInfo(const LID& lid);
+  /// Get LIDInfo
+  /** Return a LIDInfo about a certain LID.*/
+  LIDInfo GetLIDInfo(const LID& lid) const;
+
+  /// Special get digit method for pointers.
+  /** It is thought for lazy fetching.*/
+  template<class T>
+  void PtrGetDigit(const LID& lid,const std::string& key, T*& ptr , T def=-1)
+  {
+    if(!ptr)
+    {
+      ptr = new T;
+      std::string tmp = Read(lid, key);
+      if(!tmp.empty())
+        *ptr = T(atof(tmp.c_str()));
+      else
+        *ptr = def;
+    }
+  }
+  /// Special get string method for pointers.
+  /** It is thought for lazy fetching.*/
+  void PtrGetString(const LID& lid , const std::string& key , std::string*& ptr )
+  {
+    if(!ptr)
+    {
+      ptr = new std::string;
+      *ptr = Read(lid, key);
+    }
+  }
+  /// Special save digit method for pointers.
+  /** Could be used in conjunction with PtrGetDigit.*/
+  template<class T>
+  void PtrSaveDigit(const LID& lid , const std::string& key , T* const& ptr) const
+  {
+    if(ptr)
+    {
+      std::stringstream tmp;
+      tmp << *ptr;
+      Write(lid, key, tmp.str());
+    }
+  }
+  /// Special save string method for pointers.
+  /** Could be used in conjunction with PtrGetString.*/
+  void PtrSaveString(const LID& lid,const std::string& key,std::string* const& ptr) const
+  {
+    if(ptr)
+    {
+      Write(lid, key, *ptr);
+    }
+  }
 
 private:
+  /// Default constructor.
+  LDatabase() : write_flag(high) {};
   // Clean a lid from unparsed data TODO
   void Clean(const LID& lid) const;
   // Test if a file exists.
-  bool Fexists(const string& filename) const;
+  bool Fexists(const std::string& filename) const;
   // Finds the highest DBRoot with the LID lid.
-  string FindTopPriorityRoot(const LID& lid) const;
+  std::string FindTopPriorityRoot(const LID& lid) const;
 
   // Contains the database roots.
   // Only one per priority!
   LDBPairSet root_prio_set;
+
+  // This is the write_flag.
+  // It defines to which priority
+  // writing is currently allowed.
+  LDBPrio write_flag;
+};
+
+/// Interface class to the database
+class LDatabaseInterface
+{
+public:
+  /// Constructor.
+  LDatabaseInterface(const LID& lid) : my_LID(lid) {};
+  /// Destructor.
+  virtual ~LDatabaseInterface() {};
+  /// Save method.
+  /** This method has to be implemented by all derived classes.
+      It is supposed to save the current data of the object to
+      the database.*/
+  virtual void Save() const = 0;
+  /// Returns the LID of the object.
+  LID GetLID() const { return my_LID; }
+
+protected:
+  /// Wrapper for LDatabase::PtrGetDigit
+  template<class T>
+  void PtrGetDigit(const std::string& key, T*& ptr, T def=-1)
+  {  LDB.PtrGetDigit(my_LID, key, ptr, def);  }
+  /// Wrapper for LDatabase::PtrGetString
+  void PtrGetString(const std::string& key, std::string*& ptr)
+  {  LDB.PtrGetString(my_LID, key, ptr); }
+  /// Wrapper for LDatabase::PtrSaveDigit
+  template<class T>
+  void PtrSaveDigit(const std::string& key,T* const& ptr) const
+    {  LDB.PtrSaveDigit(my_LID,key,ptr); };
+  /// Wrapper for LDatabase::PtrSaveString
+  void PtrSaveString(const std::string& key,std::string* const& ptr) const
+    {  LDB.PtrSaveString(my_LID, key, ptr);  };
+
+  /// Static reference to LDatabase object.
+  static LDatabase& LDB;
+
+  /// My LID.
+  LID my_LID;
 };
 
 #endif //LDATABASE_H
