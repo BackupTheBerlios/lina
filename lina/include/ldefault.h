@@ -32,6 +32,7 @@
 #include <lserver.h>
 #include <lclient.h>
 #include <lobjectmanager.h>
+#include <ldatagenerator.h>
 
 namespace LINA {
 

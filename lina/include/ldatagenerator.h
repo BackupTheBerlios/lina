@@ -31,15 +31,15 @@ namespace LINA
   {
 
   public:
-    DataGenerator(const std::string& datafile, bool allow_repetition_ = false);
+    DataGenerator(const std::string& datafile, bool allow_repetition = true);
+    ~DataGenerator();
     const std::string GetRandomData();
     const std::set<std::string>* GetData() { return &data; };
     int Size() { return data.size(); };
 
   private:
     std::set<std::string> data;
-    std::set<void*> used_data;
-    bool allow_repetition;
+    std::set<int>* used_indexs;
 
   };
 

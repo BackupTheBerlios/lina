@@ -18,35 +18,69 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <zlib.h>
 #include <ldatagenerator.h>
 #include <lrand.h>
 
-LINA::DataGenerator::DataGenerator(const std::string& datafile, bool allow_repetition_)
+/* ===========================================================================
+      Reads bytes from the compressed file until  an
+   end-of-file condition is encountered.  The string is then terminated
+   with a null character.
+      gzgets returns buf, or Z_NULL in case of error.
+*/
+char * ZEXPORT gzgetsa(gzFile file) //FIXME: optimize it to death and try to make it an official zlib function @tobgle
 {
-allow_repetition = allow_repetition_;
+  unsigned int buffer_chunk = 1024;
+  unsigned int chunk_number = 1;
+  char *b = (char*) malloc(sizeof(char)*buffer_chunk);
+  char *pb = b;
+  int eof = 0;
+  while (--buffer_chunk > 0 || ((buffer_chunk = 1024) && ++chunk_number && (pb = (char*) realloc(pb,sizeof(char)*buffer_chunk))) && (gzread(file, b, 1) == 1 || !(eof = 1)) && *b++ != '\0');
+{}
+  *b = '\0';
+  return (eof && pb == b) ? Z_NULL : pb;
+}
 
- /*   gzFile file = gzopen(datafile,"rb");
+LINA::DataGenerator::DataGenerator(const std::string& datafile, bool allow_repetition)
+{
+  if(allow_repetition)
+    used_indexs = NULL;
+  else
+    used_indexs = new std::set<int>();
 
-    const short int MAXLINESIZE = 1024;
+  gzFile file = gzopen(datafile.c_str(),"rb");
 
-    char c;
-    while((c = gzgetc(file)) != -1)
-    
-    for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != Z_NULL ; )
-    {
-      text += tmpline;
-    }
-    gzclose(file);*/
+  char* c;
+  while((c = gzgetsa(file)) != Z_NULL)
+  {
+    data.insert(c);
+    delete c;
+  }
+
+  gzclose(file);
+}
+
+LINA::DataGenerator::~ DataGenerator()
+{
+  delete used_indexs;
 }
 
 const std::string LINA::DataGenerator::GetRandomData()
 {
-LINA::Random rand;
-int index = rand.RandInt(data.size());
-std::set<std::string>::iterator it;
-for(it = data.begin(); index != 0; --index)
-{}
-return (*it);
+  LINA::Random rand;
+  int index = rand.RandInt(data.size());
+  std::set<std::string>::iterator it;
+  for(it = data.begin(); index != 0; --index, ++it)
+  {}
+  if(used_indexs && used_indexs->size() < data.size())
+  {
+    std::pair<std::set<int>::iterator,bool> test = used_indexs->insert(index);
+    if(test.second = false)
+      return GetRandomData();
+  }
+  return (*it);
 }
+
+
 
 
