@@ -33,6 +33,7 @@
 #include <set>
 #include <cstdio>
 #include <cerrno>
+#include <lconvertor.h>
 
 /// LINA ID
 /** This class stores a unique ID,
@@ -121,8 +122,6 @@ public:
   template<class Cont>
   void WriteArray(const LID& lid, const std::string& key, const Cont& cont) const { WriteArray(lid,key,cont.begin(),cont.end()); }
 
-  //  forkLID(const LID& lid, LDBPrio from, LDBPrio to=high) const;
-
   /// Get all keys in a LID
   /** Gets all keys and pushs them into key_set.
       Returns the number of keys.*/
@@ -154,7 +153,7 @@ public:
   /// Set write_flag
   /** The write_flag defines to which database priority
       data may be written currently.*/
-  void SetWriteFlag(enum LDBPrio prio=high) { write_flag=prio; };
+void SetWriteFlag(enum LDBPrio prio=high) { write_flag=prio; };
 
   /// Information about a LID.
   /** Contains information about a LID.*/
@@ -168,53 +167,6 @@ public:
   /// Get LIDInfo
   /** Return a LIDInfo about a certain LID.*/
   LIDInfo GetLIDInfo(const LID& lid) const;
-
-  /// Special get digit method for pointers.
-  /** It is thought for lazy fetching.*/
-  template<class T>
-  void PtrGetDigit(const LID& lid,const std::string& key, T*& ptr , T def=-1)
-  {
-    if(!ptr)
-    {
-      ptr = new T;
-      std::string tmp = Read(lid, key);
-      if(!tmp.empty())
-        *ptr = T(atof(tmp.c_str()));
-      else
-        *ptr = def;
-    }
-  }
-  /// Special get string method for pointers.
-  /** It is thought for lazy fetching.*/
-  void PtrGetString(const LID& lid , const std::string& key , std::string*& ptr )
-  {
-    if(!ptr)
-    {
-      ptr = new std::string;
-      *ptr = Read(lid, key);
-    }
-  }
-  /// Special save digit method for pointers.
-  /** Could be used in conjunction with PtrGetDigit.*/
-  template<class T>
-  void PtrSaveDigit(const LID& lid , const std::string& key , T* const& ptr) const
-  {
-    if(ptr)
-    {
-      std::stringstream tmp;
-      tmp << *ptr;
-      Write(lid, key, tmp.str());
-    }
-  }
-  /// Special save string method for pointers.
-  /** Could be used in conjunction with PtrGetString.*/
-  void PtrSaveString(const LID& lid,const std::string& key,std::string* const& ptr) const
-  {
-    if(ptr)
-    {
-      Write(lid, key, *ptr);
-    }
-  }
 
 private:
   /// Default constructor.
@@ -241,7 +193,8 @@ class LDatabaseInterface
 {
 public:
   /// Constructor.
-  LDatabaseInterface(const LID& lid) : my_LID(lid) {};
+  LDatabaseInterface(const LID& lid,const std::string& section="") : my_LID(lid) , my_section(section)
+  { if(!my_section.empty()){ my_section+="."; } }
   /// Destructor.
   virtual ~LDatabaseInterface() {};
   /// Save method.
@@ -253,26 +206,54 @@ public:
   LID GetLID() const { return my_LID; }
 
 protected:
-  /// Wrapper for LDatabase::PtrGetDigit
+  std::set<void*> lazy_members;
+
+  ///Marks a member as lazy. This means that the LazyGet methods won't try
+  ///to read its value from the database.
+  void MakeLazy(void* address);
+
+  ///Reads data of the database, if ref isn't marked as lazy.
   template<class T>
-  void PtrGetDigit(const std::string& key, T*& ptr, T def=-1)
-  {  LDB.PtrGetDigit(my_LID, key, ptr, def);  }
-  /// Wrapper for LDatabase::PtrGetString
-  void PtrGetString(const std::string& key, std::string*& ptr)
-  {  LDB.PtrGetString(my_LID, key, ptr); }
-  /// Wrapper for LDatabase::PtrSaveDigit
+  void LazyGet(std::string& ref, const std::string& key);
+
+  ///Reads data of the database, if ref isn't marked as lazy.
   template<class T>
-  void PtrSaveDigit(const std::string& key,T* const& ptr) const
-    {  LDB.PtrSaveDigit(my_LID,key,ptr); };
-  /// Wrapper for LDatabase::PtrSaveString
-  void PtrSaveString(const std::string& key,std::string* const& ptr) const
-    {  LDB.PtrSaveString(my_LID, key, ptr);  };
+  void LazyGet(std::string*& ref, const std::string& key);
+
+  ///Reads data of the database, if ref isn't marked as lazy.
+  template<class T>
+  void LazyGet(T& ref, const std::string& key);
+
+  ///Reads data of the database, if ref isn't marked as lazy.
+  template<class T>
+  void LazyGet(T*& ref, const std::string& key);
+
+  ///Writes data to the database, if ref is marked as lazy.
+  template<class T>
+  void LazySave(const T& ref, const std::string& key) const;
+
+  ///Writes data to the database, if ref is marked as lazy.
+  template<class T>
+  void LazySave(const T*& ref, const std::string& key) const;
+
+  ///Writes data to the database, if ref is marked as lazy.
+  template<class T>
+  void LazySave(const std::string& ref, const std::string& key) const;
+
+  ///Writes data to the database, if ref is marked as lazy.
+  template<class T>
+  void LazySave(const std::string*& ref, const std::string& key) const;
 
   /// Static reference to LDatabase object.
   static LDatabase& LDB;
 
   /// My LID.
   LID my_LID;
+
+  /// Section
+  std::string my_section;
 };
+
+#include "../lib/ldatabase_tpl.cpp"
 
 #endif //LDATABASE_H
