@@ -21,85 +21,88 @@
 #ifndef LUTILITY_H
 #define LUTILITY_H
 
+#include <stdio.h>
 #include <iostream>
 #include <string>
 
-using namespace std;
-
- ///LDebug helps debugging
- /**The first parameter is the debug-message and
-   with the second one you can set wether the program
-   should be hold or not.*/
+/// LDebug helps debugging
+/** The first parameter is the debug-message and
+    with the second one you can set wether the program
+    should be hold or not.*/
 template<class T>
 void LDebug(const T& msg,bool hold=false)
 {
-cout<<"LDebug: "<<msg<<endl;
-if(hold)
-getc(stdin);
+  std::cout<<"LDebug: "<<msg<<std::endl;
+  if(hold)
+    getc(stdin);
 }
 
- ///LDebug helps debugging
- /**The first parameter is the expected output, the second
-   one is the output and with the third one you can set wether the program
-   should be hold or not.*/
+/// LDebug helps debugging
+/** The first parameter is the expected output, the second
+    one is the output and with the third one you can set wether the program
+    should be hold or not.*/
 template<class T,class C>
 void LDebug(const T& expected,const C& output,bool hold=false)
 {
-cout<<"LDebug - Expected output:"<<endl;
-cout<<expected<<endl;
-cout<<"LDebug - Output:"<<endl;
-cout<<output<<endl;
-if(hold)
-getc(stdin);
+  std::cout<<"LDebug - Expected output:"<<std::endl;
+  std::cout<<expected<<std::endl;
+  std::cout<<"LDebug - Output:"<<std::endl;
+  std::cout<<output<<std::endl;
+  if(hold)
+    getc(stdin);
 }
 
-///LPtr is LINA's smart pointer
+/// LPtr is LINA's smart pointer
 template <class T>
-class LPtr {
+class LPtr
+{
 public:
-///constructor
-LPtr(T* realPtr = 0) : pointee(realPtr) {};
-///constructor
-LPtr(T value)
-{
-pointee = new T;
-*pointee = value;
-};
-///copy-constructor
-LPtr(const LPtr& rhs) : pointee(rhs) {};
-///destructor
-~LPtr() { delete pointee; };
-///operator=
-LPtr& operator=(const LPtr& rhs)
-{
-if ( this != &rhs )
-{
-delete pointee;
-pointee = &*rhs;
-}
-return *this;
-};
+  /// Constructor
+  LPtr(T* realPtr = 0) : pointee(realPtr) {};
+  /// Constructor
+  LPtr(T value)
+  {
+    pointee = new T;
+    *pointee = value;
+  };
+  /// Copy-constructor
+  LPtr(const LPtr& rhs) : pointee(rhs) {};
+  /// Destructor
+  ~LPtr() { delete pointee; };
+  /// Operator=
+  LPtr& operator=(const LPtr& rhs)
+  {
+    if ( this != &rhs )
+    {
+      delete pointee;
+      pointee = &*rhs;
+    }
+    return *this;
+  };
 
-///-> operator
-T* operator-> () const { return pointee; };
-///dereferencing operator
-T& operator*() const { return *pointee; };
+  /// -> operator
+  T* operator-> () const { return pointee; };
+  /// Dereferencing operator
+  T& operator*() const { return *pointee; };
 
-///Is it NULL?
-bool isNULL() const
-{
-if (pointee)
-return false;
-else
-return true;
-};
+  /// Is it NULL?
+  bool isNULL() const
+  {
+    if (pointee)
+      return false;
+    else
+      return true;
+  };
 
-///converts to a reference of a real pointer
+  /// Converts to a reference of a real pointer
 operator T*&() { return pointee; };
 
+  /// Converts to a reference of a real pointer
+  operator T* const&() const { return pointee; };
+
 private:
-//the real pointer
-T* pointee;
+  // The real pointer
+  T* pointee;
 };
 
 #endif //LUTILITY_H
