@@ -6,5 +6,19 @@ AM_INIT_AUTOMAKE(lina, 0.0.1)
 AC_LANG_CPLUSPLUS
 AC_PROG_CXX
 AM_PROG_LIBTOOL
+AM_CONDITIONAL(WANT_QLDB, test "$enable_qldb" = "yes")
+AC_ARG_ENABLE(qldb,
+AC_HELP_STRING([--enable-qldb],[enable QLDB [[default=no]]]),
+[case $enableval in
+yes|no) ;;
+*) AC_MSG_ERROR([bad value $enableval for --enable-qldb, need yes or no]) ;;
+esac],
+[enable_qldb=no])
+if test "$enable_qldb" = "yes"; then
+  QT_DO_IT_ALL
+  AC_DEFINE(WANT_QLDB,1,
+  [./configure --enable-qldb option, to enable QLDB])
+fi
 
-AC_OUTPUT(Makefile src/Makefile)
+
+AC_OUTPUT(Makefile src/Makefile src/tests/Makefile lib/Makefile src/tools/Makefile src/tools/qldb/Makefile include/Makefile)
