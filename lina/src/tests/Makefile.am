@@ -1,6 +1,6 @@
 INCLUDES = -I$(top_srcdir)/include $(all_includes)
 METASOURCES = AUTO
-bin_PROGRAMS = ldbtest lcalendartest lutilitytest lconvtest lrangetest
+bin_PROGRAMS = ldbtest lcalendartest lutilitytest lrangetest
 
 ldbtest_SOURCES =  ldbtest.cpp
 
