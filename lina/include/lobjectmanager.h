@@ -18,24 +18,48 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <lconvert.h>
-#include <lrand.h>
-#include <lrange.h>
+#ifndef LOBJECTMANAGER_H
+#define LOBJECTMANAGER_H
+
 #include <ldatabase.h>
-#include <lutility.h>
-#include <lcalendar.h>
-#include <lstadium.h>
-#include <lfootballstadium.h>
-#include <lcompetition.h>
-#include <lstats.h>
-#include <lnetwork.h>
-#include <lserver.h>
-#include <lclient.h>
-#include <lobjectmanager.h>
 
-namespace LINA {
+#include <map>
+#include <set>
 
-Database& DB = Database::Get();
-ObjectManager& OM = ObjectManager::Get();
+namespace LINA
+{
 
-}
+  class DatabaseInterfaceProxyImpl : public DatabaseInterface
+  {
+  public:
+    DatabaseInterfaceProxyImpl(const ID& lid,const std::string& section="") : DatabaseInterface(lid,section) {};
+    virtual void Save() const {};
+  };
+
+  typedef std::set<DatabaseInterface*,DatabaseInterface::Less> DatabaseInterfaceSet;
+  
+  class ObjectManager
+  {
+  public:
+    ~ObjectManager();
+  
+    static ObjectManager& Get();
+    DatabaseInterface* GetObject(const ID& id);
+    void InsertObject(DatabaseInterface* object);
+    std::set<std::string> GetCatalogs();
+    DatabaseInterfaceSet* GetCatalog(std::string catalog);
+
+
+  private:
+    /// Default constructor is private, so you can't generate objects.
+  ObjectManager() {};
+
+    std::map<std::string, DatabaseInterfaceSet > object_map;
+  };
+
+} //End of namespace LINA
+
+#endif //LOBJECTMANAGER_H
+
+
+

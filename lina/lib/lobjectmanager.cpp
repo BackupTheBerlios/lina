@@ -18,24 +18,50 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <lconvert.h>
-#include <lrand.h>
-#include <lrange.h>
-#include <ldatabase.h>
-#include <lutility.h>
-#include <lcalendar.h>
-#include <lstadium.h>
-#include <lfootballstadium.h>
-#include <lcompetition.h>
-#include <lstats.h>
-#include <lnetwork.h>
-#include <lserver.h>
-#include <lclient.h>
 #include <lobjectmanager.h>
 
-namespace LINA {
+LINA::ObjectManager::~ObjectManager()
+{
+  for(std::map<std::string, LINA::DatabaseInterfaceSet >::iterator it = object_map.begin(); it != object_map.end(); ++it)
+    {
+      for(DatabaseInterfaceSet::iterator sit = (*it).second.begin(); sit != (*it).second.end(); ++sit)
+        {
+	delete (*sit);
+        }
 
-Database& DB = Database::Get();
-ObjectManager& OM = ObjectManager::Get();
-
+    }
 }
+
+LINA::ObjectManager& LINA::ObjectManager::Get()
+{
+  static LINA::ObjectManager instance;
+  return instance;
+}
+
+LINA::DatabaseInterface* LINA::ObjectManager::GetObject(const LINA::ID& id)
+{
+  LINA::DatabaseInterface* pid = new LINA::DatabaseInterfaceProxyImpl(id);
+  return (*object_map[id.Catalog()].find(pid));
+}
+
+void LINA::ObjectManager::InsertObject(LINA::DatabaseInterface* object)
+{
+  object_map[object->GetID().Catalog()].insert(object);
+}
+
+std::set<std::string> LINA::ObjectManager::GetCatalogs()
+{
+std::set<std::string> catalogs;
+  for(std::map<std::string, LINA::DatabaseInterfaceSet >::iterator it = object_map.begin(); it != object_map.end(); ++it)
+    {
+     catalogs.insert((*it).first);
+    }
+}
+
+LINA::DatabaseInterfaceSet* LINA::ObjectManager::GetCatalog(std::string catalog)
+{
+return &object_map[catalog];
+}
+
+
+    
