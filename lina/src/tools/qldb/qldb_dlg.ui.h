@@ -11,7 +11,10 @@
 #include <qinputdialog.h>
 #include <qstring.h>
 #include <ldatabase.h>
+#include <ldefault.h>
 #include <vector>
+
+using namespace std;
 
 QDir root;
 LID* current_LID=NULL;
@@ -20,6 +23,11 @@ void QLDB::open_database_root()
 {
   //get a existing Directory and assign it to root
   root = QFileDialog::getExistingDirectory();
+
+  //Clear all database-roots
+  LDB.Clear();
+  //Add database root
+  LDB.AddRoot(root.path().latin1());
 
   listView->clear();
   //get the catalogs in the database root and assign them to catalogs
@@ -59,20 +67,17 @@ void QLDB::open_LID( QListViewItem* item )
     table->setNumCols(1);
     table->setNumRows(0);
 
-    LDatabase db;
-    db.AddRoot(root.path().latin1());
-
-    std::vector<string> keys;
-    table->setNumRows(db.GetKeys(LID(item->parent()->text(0).latin1(),item->text(0).latin1()),keys));
+    std::set<string> keys;
+    table->setNumRows(LDB.GetKeys(LID(item->parent()->text(0).latin1(),item->text(0).latin1()),keys));
     int i=0;
-    for(vector<string>::iterator it = keys.begin(); it != keys.end(); ++it,++i)
+    for(set<string>::iterator it = keys.begin(); it != keys.end(); ++it,++i)
     {
       //insert the key into the table
       table->setItem( i, 0, new QTableItem( table, QTableItem::WhenCurrent, (*it).c_str() ));
 
       //read the key's value array and assign it to value_vector
       vector<string> value_vector;
-      db.ReadArray(LID(item->parent()->text(0).latin1(),item->text(0).latin1()),(*it),value_vector);
+      LDB.ReadArray(LID(item->parent()->text(0).latin1(),item->text(0).latin1()),(*it),value_vector);
       int y=1;
       for(vector<string>::iterator s_it = value_vector.begin(); s_it != value_vector.end(); ++s_it,++y)
       {
@@ -104,9 +109,6 @@ void QLDB::save_LID()
 {
   if(current_LID)
   {
-    //create a LDatabase object and add the root
-    LDatabase db;
-    db.AddRoot(root.path().latin1());
 
     for(int i=0;i != table->numRows(); ++i)
     {
@@ -124,7 +126,7 @@ void QLDB::save_LID()
         }
 
 	//write the array of the current key to the LID
-        db.WriteArray(*current_LID,table->text(i,0).latin1(),value_vector);
+        LDB.WriteArray(*current_LID,table->text(i,0).latin1(),value_vector);
       }
     }
   }
