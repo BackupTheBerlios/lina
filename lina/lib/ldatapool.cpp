@@ -19,7 +19,7 @@
  ***************************************************************************/
 
 #include <zlib.h>
-#include <ldatagenerator.h>
+#include <ldatapool.h>
 #include <lrand.h>
 
 /* ===========================================================================
@@ -35,13 +35,16 @@ char * ZEXPORT gzgetsa(gzFile file) //FIXME: optimize it to death and try to mak
   char *b = (char*) malloc(sizeof(char)*buffer_chunk);
   char *pb = b;
   int eof = 0;
-  while (--buffer_chunk > 0 || ((buffer_chunk = 1024) && ++chunk_number && (pb = (char*) realloc(pb,sizeof(char)*buffer_chunk))) && (gzread(file, b, 1) == 1 || !(eof = 1)) && *b++ != '\0');
+  while ((--buffer_chunk > 0 ||
+  ((buffer_chunk = 1024) && ++chunk_number
+   && (pb = (char*) realloc(pb,sizeof(char)*buffer_chunk*chunk_number)) && !(b = pb)))
+   && (gzread(file, b, 1) == 1 || !(eof = 1)) && *b++ != '\0');
 {}
   *b = '\0';
   return (eof && pb == b) ? Z_NULL : pb;
 }
 
-LINA::DataGenerator::DataGenerator(const std::string& datafile, bool allow_repetition)
+LINA::DataPool::DataPool(const std::string& datafile, bool allow_repetition)
 {
   if(allow_repetition)
     used_indexs = NULL;
@@ -50,22 +53,28 @@ LINA::DataGenerator::DataGenerator(const std::string& datafile, bool allow_repet
 
   gzFile file = gzopen(datafile.c_str(),"rb");
 
-  char* c;
+  char* c = gzgetsa(file);
+  if(c != Z_NULL)
+  {
+  name = c;
+  delete c;
+  }
+  
   while((c = gzgetsa(file)) != Z_NULL)
   {
     data.insert(c);
-    delete c;
+    free(c);
   }
 
   gzclose(file);
 }
 
-LINA::DataGenerator::~ DataGenerator()
+LINA::DataPool::~DataPool()
 {
   delete used_indexs;
 }
 
-const std::string LINA::DataGenerator::GetRandomData()
+const std::string LINA::DataPool::GetRandomData()
 {
   LINA::Random rand;
   int index = rand.RandInt(data.size());

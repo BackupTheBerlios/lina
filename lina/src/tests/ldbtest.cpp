@@ -37,6 +37,14 @@ using namespace LINA;
 int main(int argc, char *argv[])
 {
 
+DataPool datgen("sometestfile");
+const std::set<std::string>* datsss = datgen.GetData();
+for(std::set<std::string>::iterator it = datsss->begin(); it != datsss->end(); ++it)
+{
+std::cout<<(*it)<<std::endl;
+}
+
+
 ID* bla = new ID("bla","foo");
 
 

@@ -1,5 +1,5 @@
 INCLUDES =
 METASOURCES = AUTO
 
-include_HEADERS = ldatabase.h lcalendar.h lutility.h ldefault.h lmatch.h lstadium.h lfootballstadium.h lrange.h lrand.h lconvert.h lmetrics.h lcompetition.h lstats.h lserver.h lclient.h lnetwork.h lobjectmanager.h ldatagenerator.h
+include_HEADERS = ldatabase.h lcalendar.h lutility.h ldefault.h lmatch.h lstadium.h lfootballstadium.h lrange.h lrand.h lconvert.h lmetrics.h lcompetition.h lstats.h lserver.h lclient.h lnetwork.h lobjectmanager.h ldatapool.h
 SUBDIRS =  netxx

@@ -6,6 +6,6 @@ lib_LIBRARIES = liblina.a
 
 
 
-liblina_a_SOURCES = ldatabase.cpp lcalendar.cpp lutility.cpp lmatch.cpp lstadium.cpp lfootballstadium.cpp lconvert.cpp lmetrics.cpp lcompetition.cpp lstats.cpp lserver.cpp lclient.cpp lnetwork.cpp lobjectmanager.cpp ldatagenerator.cpp
+liblina_a_SOURCES = ldatabase.cpp lcalendar.cpp lutility.cpp lmatch.cpp lstadium.cpp lfootballstadium.cpp lconvert.cpp lmetrics.cpp lcompetition.cpp lstats.cpp lserver.cpp lclient.cpp lnetwork.cpp lobjectmanager.cpp ldatapool.cpp
 SUBDIRS =  netxx
 liblina_a_LIBADD = $(top_builddir)/lib/netxx/libnetxx.a

@@ -18,8 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef LDATAGENERATOR_H
-#define LDATAGENERATOR_H
+#ifndef LDATAPOOL_H
+#define LDATAPOOL_H
 
 #include <set>
 #include <string>
@@ -27,23 +27,25 @@
 namespace LINA
 {
 
-  class DataGenerator
+  class DataPool
   {
 
   public:
-    DataGenerator(const std::string& datafile, bool allow_repetition = true);
-    ~DataGenerator();
+    DataPool(const std::string& datafile, bool allow_repetition = true);
+    ~DataPool();
     const std::string GetRandomData();
     const std::set<std::string>* GetData() { return &data; };
     int Size() { return data.size(); };
+    const std::string& Name() { return name; }
 
   private:
     std::set<std::string> data;
     std::set<int>* used_indexs;
+    std::string name;
 
   };
 
 } // end LINA namespace
 
-#endif //LDATAGENERATOR_H
+#endif //LDATAPOOL_H
 
