@@ -21,14 +21,22 @@
 #include <string.h>
 #include <iostream>
 #include <lclient.h>
+#include <lrand.h>
 
 using namespace Netxx;
 
-LClient::LClient()
+LClient::LClient(std::string uri)
 {
+  connected = false;
   try
   {
-    stream_client = new TLS::Stream(context,"localhost",lina_port);
+    timeout.set_sec(500000);
+    stream_client = new Stream(uri.c_str(),lina_port);
+    Netxx::SockOpt sockopt(stream_client->get_socketfd());
+    sockopt.set_non_blocking();
+    LRand rand;
+    internal_id = rand.RandInt();
+    connected = true;
   }
   catch (std::exception &e)
   {
@@ -36,22 +44,45 @@ LClient::LClient()
   }
 }
 
-LClient::~ LClient()
+void LClient::Reconnect()
 {
   delete stream_client;
+  stream_client = new Stream("localhost",lina_port);
 }
 
-void LClient::SendMsg(const LNetMsg type, const std::string& message)
+void LClient::Disconnect()
 {
-char* buffer = new char[message.size()+1];
-buffer[0] = type;
-strcpy(&buffer[1],message.c_str());
-std::cout<<type<< "-" << message <<std::endl;
-if ( (byte_count = stream_client->write(buffer, message.size()+1)) <= 0)
-std::cout<<"byte_count <= 0"<<std::endl;
+  if(connected)
+  {
+    SendPackage(LNetPackage(LNetDisconnect));
+    delete stream_client;
+    connected = false;
+  }
+}
 
-/*byte_count = stream_client->read(buffer, sizeof(buffer));*/
-delete buffer;
+void LClient::ConnectTo(std::string uri)
+{
+  Disconnect();
+
+  stream_client = new Stream("localhost",lina_port);
+  Netxx::SockOpt sockopt(stream_client->get_socketfd());
+  sockopt.set_non_blocking();
+  connected = true;
+}
+
+LClient::~ LClient()
+{
+  Disconnect();
+}
+
+int LClient::ReceivePackage(LNetPackage& net_package)
+{
+  LNetwork::ReceivePackage(*stream_client,net_package);
+}
+
+void LClient::SendPackage(const LNetPackage& net_package)
+{
+  LNetwork::SendPackage(*stream_client,net_package);
 }
 
 

@@ -27,9 +27,13 @@ using namespace std;
 int main(int argc, char *argv[])
 {
   LClient client;
-  client.SendMsg(LNetConnect,"\nHere I am!\n");
+  for(;;)
+  {
+  client.SendPackage(LNetPackage(LNetConnect,"\nHere I am! With Boost!\n"));
   
-  client.SendMsg(LNetDisconnect,"\nAgain and Again!\n");
+  client.SendPackage(LNetPackage(LNetDisconnect,"\nAgain and Again!\n"));
+  sleep(2);
+  }
 
   return EXIT_SUCCESS;
 }

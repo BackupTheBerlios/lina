@@ -21,10 +21,10 @@
 #ifndef LSERVER_H
 #define LSERVER_H
  
-#include <set>
+#include <map>
 #include <lnetwork.h>
 
-class LServer
+class LServer : public LNetwork
 {
 public:
  LServer();
@@ -35,10 +35,8 @@ private:
 void HandleConnections();
 
 Netxx::StreamServer* stream_server;
-Netxx::TLS::Context  context;
 Netxx::Timeout timeout;
-char* buffer;
-std::set<Netxx::Peer> clients;
+std::map<Netxx::Peer,Netxx::Stream*> clients;
 };
 
 #endif //LSERVER_H

@@ -21,17 +21,48 @@
 #ifndef LNETWORK_H
 #define LNETWORK_H
 
+#include <iostream>
 #include <netxx/tls/netxx.h>
 
 extern const Netxx::port_type lina_port;
 
 /* This is NOT final and only for testing purposes right now.*/
 
-enum LNetMsg {
-  
- LNetConnect = 0,
- LNetDisconnect = 1,
+/* LINA Network Package Type. */
+enum LNetPT {
+
+  LNetConnect = 0,
+  LNetDisconnect = 1,
+  LNetMessage = 2,
+  LNetUndefined = -1
 
 };
- 
+
+/* LINA Network Package. */
+class LNetPackage
+{
+public:
+  LNetPackage(LNetPT type_ = LNetUndefined) : type(type_), buffer(NULL), size(0) {};
+  LNetPackage(LNetPT type_, std::string buffer_) : type(type_) { size = buffer_.size()+1; buffer = new char[size]; std::memcpy(buffer,buffer_.c_str(),size); std::cout<<"BUFFER:"<<buffer<<std::endl;};
+  ~LNetPackage() { delete buffer; };
+
+public:
+  char* buffer;
+  unsigned int size;
+  LNetPT type;
+};
+
+/* Base class for LServer and LClient. */
+class LNetwork
+{
+public:
+  LNetwork() {};
+  int ReceivePackage(Netxx::Stream& net_stream, LNetPackage& net_package);
+  void SendPackage(Netxx::Stream& net_stream, const LNetPackage& net_package);
+
+protected:
+  char* buffer;
+  Netxx::signed_size_type byte_count;
+};
+
 #endif //LNETWORK_H

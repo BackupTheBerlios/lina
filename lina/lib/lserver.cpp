@@ -27,9 +27,9 @@ LServer::LServer()
 {
   try
   {
-    timeout.set_sec(1);
-    context.load_private_key("lina.pem");
-    context.load_cert_chain("lina.pem");
+    timeout.set_usec(10000);
+    /*context.load_private_key("lina.pem");
+    context.load_cert_chain("lina.pem");*/
     stream_server = new StreamServer(lina_port,timeout);
     buffer = new char[1024];
   }
@@ -56,49 +56,70 @@ void LServer::HandleConnections()
   {
     for(;;)
     {
+      /* Accept connection with peer. */
       Netxx::Peer client = stream_server->accept_connection();
+      /*Set the socket to non blocking. */
       Netxx::SockOpt sockopt(client.get_socketfd());
       sockopt.set_non_blocking();
-      clients.insert(client);
 
+      /* Check for timeouts. */
       if (!client)
       {
-        std::cout << "timeout waiting for connection" << std::endl;
-        continue;
+        /*std::cout<< "timeout" << std::endl;*/
       }
-
-      Netxx::TLS::Stream client_stream(context, client.get_socketfd(),
-                                       Netxx::TLS::Stream::mode_server, timeout);
+      else
+      {
+        clients.insert(std::pair<Netxx::Peer,Netxx::Stream*>(client, new Netxx::Stream(client.get_socketfd())));
+        /* Who connected? IP:PORT */
+        std::cout << " connection from " << client << std::endl;
+      }
+      /* Set up stream with the client. */
+      /*      Netxx::TLS::Stream* client_stream = new Netxx::TLS::Stream(context, client.get_socketfd(),
+                                             Netxx::TLS::Stream::mode_server, timeout);*/
+      /* Counts the incoming bytes. */
       Netxx::signed_size_type bytes_read;
 
-      std::cout << " connection from " << client << std::endl;
-
-      char* buffer2 = NULL;
-      unsigned int bytes = 0;
-      while ( (bytes_read = client_stream.read(buffer, sizeof(buffer))) > 0)
+      for(std::map<Netxx::Peer,Netxx::Stream*>::iterator it = clients.begin(); it != clients.end(); ++it)
       {
-        unsigned int old = bytes;
-        bytes += bytes_read;
-        buffer2 = (char*) realloc(buffer2,bytes+1);
-        memcpy(buffer2+old,buffer,bytes_read);
-        std::cout<<bytes<<std::endl;
+        Netxx::Stream* client_stream = (*it).second;
+        for(bool break_loop = false; !break_loop;)
+        {
+
+          LNetPackage net_package;
+          if(ReceivePackage(*client_stream, net_package) == -1)
+            break;
+
+          switch(net_package.type) 
+          {
+          case LNetDisconnect: /* Disconnect client. */
+            delete (*it).second;
+            clients.erase(it);
+	    std::cout << " client disconnected from server" << std::endl;
+	    break_loop = true;
+            break;
+          case LNetMessage:
+            std::cout<<"Message Received:"<<net_package.buffer<< std::endl;
+            for(std::map<Netxx::Peer,Netxx::Stream*>::iterator sit = clients.begin(); sit != clients.end(); ++sit)
+            {
+              Netxx::Stream* other_client_stream = (*sit).second;
+              SendPackage(*other_client_stream, net_package);
+            }
+	    break;
+	  default:
+	    break;
+          }
+
+          /* For testing only! */
+          /*std::cout<< type << "-" << message << std::endl;*/
+
+        }
       }
-      buffer2[bytes] = '\0';
-
-      LNetMsg type = static_cast<LNetMsg>(buffer2[0]);
-      std::string message = &buffer2[1];
-
-      /* For testing only! */
-      std::cout<< type << "-" << message << std::endl;
-
-      delete buffer2;
 
       //client_stream.write(buffer, bytes_read);
 
 
 
       //std::cout << " client disconnected from server" << std::endl;
-
     }
   }
   catch (std::exception &e)

@@ -28,6 +28,9 @@
 #include <lfootballstadium.h>
 #include <lcompetition.h>
 #include <lstats.h>
+#include <lnetwork.h>
+#include <lserver.h>
+#include <lclient.h>
 
 LDatabase& LDB = LDatabase::Get();
 

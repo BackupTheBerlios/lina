@@ -24,17 +24,23 @@
 #include <iostream>
 #include <lnetwork.h>
 
-class LClient
+class LClient : public LNetwork
 {
 public:
- LClient();
+ LClient(std::string uri = "localhost");
  ~LClient();
- void SendMsg(const LNetMsg type,const std::string& message);
+ void Reconnect();
+ void Disconnect();
+ void ConnectTo(std::string uri = "localhost");
+ int ReceivePackage(LNetPackage& net_package);
+ void SendPackage(const LNetPackage& net_package);
+ bool IsConnected() { return connected; };
  
 private:
-Netxx::TLS::Stream* stream_client;
-Netxx::TLS::Context context;
-Netxx::signed_size_type byte_count;
+Netxx::Timeout timeout;
+Netxx::Stream* stream_client;
+int internal_id;
+bool connected;
 };
 
 #endif //LCLIENT_H
