@@ -29,7 +29,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-  cout << "Hello, world!" << endl;
+  cout << "Hello, world!\nWhen you read this message the LINA developers are still working on the LINAlib and on tools for creating the real game later. lina.linux-gamers.net - irc.oftc.net #lina <- We'd like to see you :)" << endl;
 
   return EXIT_SUCCESS;
 }
