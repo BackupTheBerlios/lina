@@ -23,15 +23,15 @@
 
 template<class T,int min,int max> LRange<T,min,max>::LRange()
 {
-    value=0;
+    value=min;
 }
 
 template<class T,int min,int max> LRange<T,min,max>::LRange(long x)
 {
-    if (x > 100)
-        x=100;
-    else if (x < 0)
-        x=0;
+    if (x > max)
+        x=max;
+    else if (x < min)
+        x=min;
     value=x;
 }
 
@@ -45,8 +45,10 @@ template<class T,int min,int max> LRange<T,min,max>& LRange<T,min,max>::operator
 
 template<class T,int min,int max> LRange<T,min,max>& LRange<T,min,max>::operator+= (const LRange<T,min,max> &rv)
 {
-    if ((value + rv.value) > 100)
-        value = 100;
+    if ((value + rv.value) > max)
+        value = max;
+    else if ((value + rv.value) < min)
+        value = min;
     else
         value += rv.value;
     return *this;
@@ -54,8 +56,10 @@ template<class T,int min,int max> LRange<T,min,max>& LRange<T,min,max>::operator
 
 template<class T,int min,int max> LRange<T,min,max>& LRange<T,min,max>::operator-= (const LRange<T,min,max> &rv)
 {
-    if ((value - rv.value) < 0)
-        value = 0;
+    if ((value - rv.value) > max)
+        value = max;
+    else if ((value - rv.value) < min)
+        value = min;
     else
         value -= rv.value;
     return *this;
@@ -63,10 +67,10 @@ template<class T,int min,int max> LRange<T,min,max>& LRange<T,min,max>::operator
 
 template<class T,int min,int max> LRange<T,min,max>& LRange<T,min,max>::operator*= (const LRange<T,min,max> &rv)
 {
-    if ((value * rv.value) > 100)
-        value = 100;
-    else if ((value * rv.value) < 0)
-        value = 0;
+    if ((value * rv.value) > max)
+        value = max;
+    else if ((value * rv.value) < min)
+        value = min;
     else
         value *= rv.value;
     return *this;
@@ -74,8 +78,10 @@ template<class T,int min,int max> LRange<T,min,max>& LRange<T,min,max>::operator
 
 template<class T,int min,int max> LRange<T,min,max>& LRange<T,min,max>::operator/= (const LRange<T,min,max> &rv)
 {
-    if ((value / rv.value) > 100)
-        value = 100;
+    if ((value / rv.value) > max)
+        value = max;
+    else if ((value / rv.value) < min)
+        value = min;
     else
         value /= rv.value;
     return *this;
