@@ -33,6 +33,13 @@ LINA::Buffer& LINA::Buffer::operator+= (const LINA::Buffer &rv)
   return *this;
 }
 
+LINA::Buffer& LINA::Buffer::operator= (const LINA::Buffer &rv)
+{
+
+  buffer.assign(rv.buffer.begin(),rv.buffer.end());
+  return *this;
+}
+
 int LINA::Network::ReceivePackage(Netxx::Stream& net_stream, LINA::NetPackage& net_package)
 {
   /* The first bytes of a datapackage are expected to be one int,

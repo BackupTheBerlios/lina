@@ -77,7 +77,12 @@ void LINAChat::receive_messages()
       people_list->clear();
       const std::set<ClientInfo>* client_infos = client.GetClientsInformation();
       for(std::set<ClientInfo>::iterator it = client_infos->begin(); it != client_infos->end(); ++it)
+      {
+          if((*it).ClientID() == client.GetClientInfo()->ClientID())
+	  nickname_label->setText((*it).Nickname());
+	  
           people_list->insertItem(QString((*it).Nickname()));
+      }
     }
 
   }

@@ -42,6 +42,7 @@ namespace LINA
     bool IsConnected() { return connected; };
     void SetClientInfo(std::string nick);
     void HandleClientInfo(const NetPackage& netpackage);
+    const ClientInfo* GetClientInfo() const { return client_info;};
     const std::set<ClientInfo>* GetClientsInformation() const { return &clients; };
 
   private:

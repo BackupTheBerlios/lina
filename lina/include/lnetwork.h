@@ -60,7 +60,7 @@ namespace LINA
   {  
     Buffer() {};
     //Copy constructor
-    Buffer(const Buffer& buffer_) { buffer = buffer_.buffer; };
+    Buffer(const Buffer& buffer_) { buffer.assign(buffer_.buffer.begin(),buffer_.buffer.end()); };
     Buffer(std::string str) { buffer.resize(str.size() + 1); std::copy(str.c_str(),str.c_str()+str.size()+1,buffer.begin()); }
     Buffer(const char* buf, unsigned int size_) { buffer.resize(size_); std::copy(buf,buf+size_,buffer.begin());};
     Buffer(const void* buf, unsigned int size_) { buffer.resize(size_); std::copy(static_cast<const char*>(buf),static_cast<const char*>(buf)+size_,buffer.begin());};
@@ -69,13 +69,14 @@ namespace LINA
     const char* Get() const { return &(*buffer.begin()); };    
     void* Void() { return &(*buffer.begin()); };
     const void* Void() const { return &(*buffer.begin()); };
-    
+        
     Netxx::size_type Size() const { return buffer.size(); }
     Netxx::size_type* SizePointer() const {  NetxxSize() = buffer.size(); return &NetxxSize(); };
     void Resize(const Netxx::size_type& new_size) { buffer.resize(new_size);};
     
     Buffer &operator+= (const Buffer&);
-
+    Buffer &operator= (const Buffer&);
+      
     static Netxx::size_type& NetxxSize() {  static Netxx::size_type instance; return instance;};
     
   private:

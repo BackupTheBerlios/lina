@@ -84,7 +84,6 @@ void LINA::Server::HandleConnections()
                                              Netxx::TLS::Stream::mode_server, timeout);*/
       /* Counts the incoming bytes. */
       Netxx::signed_size_type bytes_read;
-
       for(ClientMap::iterator it = clients.begin(); it != clients.end(); ++it)
       {
         Netxx::Stream* client_stream = (*it).second.first;
@@ -94,7 +93,8 @@ void LINA::Server::HandleConnections()
           LINA::NetPackage net_package;
           if(ReceivePackage(*client_stream, net_package) == -1)
             break;
-
+	    
+	  LINA::Buffer tmp;
           switch(net_package.type)
           {
           case LINA::NetDisconnect: /* Disconnect client. */
@@ -113,6 +113,12 @@ void LINA::Server::HandleConnections()
             break;
           case LINA::NetChatMessage:
             std::cout<<"Message Received:"<<net_package.buffer.Get()<< std::endl;
+	    
+	    tmp += LINA::Buffer("<"+ (*it).second.second.Nickname() +"> ");
+	    tmp.Resize(tmp.Size()-1); 
+	    tmp += net_package.buffer;
+	    net_package.buffer = tmp;
+	    
             for(ClientMap::iterator sit = clients.begin(); sit != clients.end(); ++sit)
             {
               Netxx::Stream* other_client_stream = (*sit).second.first;
@@ -122,6 +128,16 @@ void LINA::Server::HandleConnections()
           case LINA::NetClientInfo:
 
             std::cout << (*it).second.second.Nickname();
+	    //Make sure we don't share the same nick as someone else
+	    for(ClientMap::iterator sit = clients.begin(); sit != clients.end(); ++sit)
+            {
+              if((*sit).second.second.Nickname() == std::string(net_package.buffer.Get()+sizeof(int)))
+	      {
+	      net_package.buffer.Resize(net_package.buffer.Size()-1);
+	      net_package.buffer += LINA::Buffer("_");
+	      sit = clients.begin();
+	      }  
+            }
             (*it).second.second.SetID(*(static_cast<int*>(net_package.buffer.Void())));
             (*it).second.second.SetNickname(net_package.buffer.Get()+sizeof(int));
             std::cout << " is now known as " << (*it).second.second.Nickname() << std::endl;
