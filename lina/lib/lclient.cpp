@@ -77,11 +77,13 @@ LClient::~ LClient()
 
 int LClient::ReceivePackage(LNetPackage& net_package)
 {
+if(connected)
   LNetwork::ReceivePackage(*stream_client,net_package);
 }
 
 void LClient::SendPackage(const LNetPackage& net_package)
 {
+if(connected)
   LNetwork::SendPackage(*stream_client,net_package);
 }
 
