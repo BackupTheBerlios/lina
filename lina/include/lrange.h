@@ -18,8 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef LVALUE_H
-#define LVALUE_H
+#ifndef LRANGE_H
+#define LRANGE_H
 
 #include <iostream>
 
@@ -29,41 +29,41 @@
 template <class T=char,int min=0,int max=100>
 class LRange
 {
-    /// operators << and >>
+    /// Operators << and >>.
     /** Makes `cout' and `cin' operations
         possible with LRange. */
     friend std::ostream &operator<<<T,min,max>(std::ostream&, const LRange<T,min,max>&);
     friend std::istream &operator>><T,min,max>(std::istream& is, LRange&);
 
-    // operators for standard calculation
+    // Operators for standard calculation.
     friend LRange operator+<T,min,max>(const LRange&, const LRange&);
     friend LRange operator-<T,min,max>(const LRange&, const LRange&);
     friend LRange operator*<T,min,max>(const LRange&, const LRange&);
     friend LRange operator/<T,min,max>(const LRange&, const LRange&);
 
     private:
-      /// The value itself - isn't it sweet?
+      // The value itself - isn't it sweet?
       T value;
 
     public:
-      /// default constructor
+      /// Default constructor.
       LRange();
-
-      // other constructors
+      /// Constructor which takes a long int.
       LRange(long);
+      /// Constructor which takes an LRange.
       LRange(const LRange &rv): value(rv.value) {};
 
-      /// destructor
+      /// Destructor.
       ~LRange();
 
-      // assignmet operators
+      // Assignment operators.
       LRange &operator= (const LRange&);
       LRange &operator+= (const LRange&);
       LRange &operator-= (const LRange&);
       LRange &operator*= (const LRange&);
       LRange &operator/= (const LRange&);
 
-      // boolean operators
+      // Boolean operators.
       bool operator< (const LRange&);
       bool operator> (const LRange&);
       bool operator== (const LRange&);
@@ -71,8 +71,9 @@ class LRange
       bool operator<= (const LRange&);
       bool operator>= (const LRange&);
 
-      // Possibility to return an integer
-      // where no integer value is given.
+      /// Returns an integer value.
+      /** Possibility to return an integer
+          where no integer value is given. */
       operator int() { return value; }
 };
 
@@ -80,5 +81,5 @@ typedef LRange<char> LRangeC;
 
 #include "../lib/lrange.cpp"
 
-#endif //LVALUE_H
+#endif //LRANGE_H
 
