@@ -1,7 +1,7 @@
 INCLUDES = -I$(top_srcdir)/include $(all_includes)
 METASOURCES = AUTO
 
-if WANT_QLDB
+if WANT_QT
 QLDB_DIR = qldb
 endif
 

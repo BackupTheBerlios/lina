@@ -18,7 +18,13 @@ lfbstadiumtest_LDADD = $(top_builddir)/lib/liblina.a -lz
 lconvtest_LDADD = $(top_builddir)/lib/liblina.a -lz
 lmetricstest_SOURCES =  lmetricstest.cpp
 lmetricstest_LDADD = $(top_builddir)/lib/liblina.a -lz
-SUBDIRS = stadiumtest lchat
+
+if WANT_QT
+stadiumtest_DIR = stadiumtest
+lchat_DIR = lchat
+endif
+
+SUBDIRS = $(stadiumtest_DIR) $(lchat_DIR)
 lservertest_SOURCES =  lservertest.cpp
 lclienttest_SOURCES =  lclienttest.cpp
 lservertest_LDADD = $(top_builddir)/lib/liblina.a $(top_builddir)/lib/netxx/libnetxx.a -lssl

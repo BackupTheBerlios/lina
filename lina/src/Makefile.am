@@ -10,3 +10,4 @@ lina_LDFLAGS = $(all_libraries)
 
 METASOURCES = AUTO
 SUBDIRS = tests tools
+
