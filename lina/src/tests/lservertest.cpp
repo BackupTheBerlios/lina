@@ -27,6 +27,9 @@ using namespace std;
 int main(int argc, char *argv[])
 {
 
+  LServer server;
+  server.Run();
+
   return EXIT_SUCCESS;
 }
 

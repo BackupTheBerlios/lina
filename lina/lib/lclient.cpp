@@ -18,21 +18,40 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-
-#include <lclient.h> 
+#include <string.h>
+#include <iostream>
+#include <lclient.h>
 
 using namespace Netxx;
 
-const port_type lina_port = 1368;
-
 LClient::LClient()
 {
-stream_client = new Stream("localhost",lina_port);
+  try
+  {
+    stream_client = new TLS::Stream(context,"localhost",lina_port);
+  }
+  catch (std::exception &e)
+  {
+    std::cerr << e.what() << std::endl;
+  }
 }
 
 LClient::~ LClient()
 {
-delete stream_client;
+  delete stream_client;
+}
+
+void LClient::SendMsg(const LNetMsg type, const std::string& message)
+{
+char* buffer = new char[message.size()+1];
+buffer[0] = type;
+strcpy(&buffer[1],message.c_str());
+std::cout<<type<< "-" << message <<std::endl;
+if ( (byte_count = stream_client->write(buffer, message.size()+1)) <= 0)
+std::cout<<"byte_count <= 0"<<std::endl;
+
+/*byte_count = stream_client->read(buffer, sizeof(buffer));*/
+delete buffer;
 }
 
 

@@ -18,16 +18,24 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <netxx/netxx.h>
+#ifndef LCLIENT_H
+#define LCLIENT_H
+ 
+#include <iostream>
+#include <lnetwork.h>
 
 class LClient
 {
 public:
  LClient();
  ~LClient();
+ void SendMsg(const LNetMsg type,const std::string& message);
  
 private:
-Netxx::Stream* stream_client;
-static const Netxx::port_type lina_port;
-
+Netxx::TLS::Stream* stream_client;
+Netxx::TLS::Context context;
+Netxx::signed_size_type byte_count;
 };
+
+#endif //LCLIENT_H
+

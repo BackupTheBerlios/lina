@@ -18,17 +18,29 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <netxx/netxx.h>
+#ifndef LSERVER_H
+#define LSERVER_H
+ 
+#include <set>
+#include <lnetwork.h>
 
 class LServer
 {
 public:
  LServer();
  ~LServer();
+ void Run();
  
 private:
-Netxx::StreamServer* stream_server;
-static const Netxx::port_type lina_port;
+void HandleConnections();
 
+Netxx::StreamServer* stream_server;
+Netxx::TLS::Context  context;
+Netxx::Timeout timeout;
+char* buffer;
+std::set<Netxx::Peer> clients;
 };
+
+#endif //LSERVER_H
+
 

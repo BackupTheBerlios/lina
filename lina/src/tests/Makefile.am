@@ -21,3 +21,5 @@ lmetricstest_LDADD = $(top_builddir)/lib/liblina.a -lz
 SUBDIRS =  stadiumtest
 lservertest_SOURCES =  lservertest.cpp
 lclienttest_SOURCES =  lclienttest.cpp
+lservertest_LDADD = $(top_builddir)/lib/liblina.a $(top_builddir)/lib/netxx/libnetxx.a -lssl
+lclienttest_LDADD = $(top_builddir)/lib/liblina.a $(top_builddir)/lib/netxx/libnetxx.a -lssl

@@ -26,6 +26,10 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
+  LClient client;
+  client.SendMsg(LNetConnect,"\nHere I am!\n");
+  
+  client.SendMsg(LNetDisconnect,"\nAgain and Again!\n");
 
   return EXIT_SUCCESS;
 }

@@ -50,7 +50,31 @@ namespace Netxx {
  * and/or connected to.
 **/
 class Peer {
+
+//####################################################################
+/** 
+* Compare operator.
+*
+* @param lhs Left hand side operator.
+* @param rhs Right hand side operator.
+* @author Tobias Glaesser
+**/
+//####################################################################
+friend bool operator<(const Netxx::Peer& lhs, const Netxx::Peer& rhs) { return (lhs.socketfd_ + lhs.port_ < rhs.socketfd_ + rhs.port_); };
+ 
+//####################################################################
+/** 
+* Compare operator.
+*
+* @param lhs Left hand side operator.
+* @param rhs Right hand side operator.
+* @author Tobias Glaesser
+**/
+//####################################################################
+friend bool operator>(const Netxx::Peer& lhs, const Netxx::Peer& rhs) { return (lhs.socketfd_ + lhs.port_ > rhs.socketfd_ + rhs.port_); };
+
 public:
+  
     //####################################################################
     /** 
      * Default constructor for an invalid peer.
@@ -106,7 +130,7 @@ public:
     **/
     //####################################################################
     Peer& operator= (const Peer &other);
-
+    
     //####################################################################
     /** 
      * Swap this Peer class with another one.

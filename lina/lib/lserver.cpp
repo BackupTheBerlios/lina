@@ -18,20 +18,92 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <lserver.h> 
+#include <iostream>
+#include <lserver.h>
 
 using namespace Netxx;
 
-const port_type lina_port = 1368;
-
 LServer::LServer()
 {
-stream_server = new StreamServer(lina_port);
+  try
+  {
+    timeout.set_sec(1);
+    context.load_private_key("lina.pem");
+    context.load_cert_chain("lina.pem");
+    stream_server = new StreamServer(lina_port,timeout);
+    buffer = new char[1024];
+  }
+  catch (std::exception &e)
+  {
+    std::cerr << e.what() << std::endl;
+  }
 }
 
-LServer::~ LServer()
+LServer::~LServer()
 {
-delete stream_server;
+  delete stream_server;
+  delete buffer;
 }
 
+void LServer::Run()
+{
+  HandleConnections();
+}
 
+void LServer::HandleConnections()
+{
+  try
+  {
+    for(;;)
+    {
+      Netxx::Peer client = stream_server->accept_connection();
+      Netxx::SockOpt sockopt(client.get_socketfd());
+      sockopt.set_non_blocking();
+      clients.insert(client);
+
+      if (!client)
+      {
+        std::cout << "timeout waiting for connection" << std::endl;
+        continue;
+      }
+
+      Netxx::TLS::Stream client_stream(context, client.get_socketfd(),
+                                       Netxx::TLS::Stream::mode_server, timeout);
+      Netxx::signed_size_type bytes_read;
+
+      std::cout << " connection from " << client << std::endl;
+
+      char* buffer2 = NULL;
+      unsigned int bytes = 0;
+      while ( (bytes_read = client_stream.read(buffer, sizeof(buffer))) > 0)
+      {
+        unsigned int old = bytes;
+        bytes += bytes_read;
+        buffer2 = (char*) realloc(buffer2,bytes+1);
+        memcpy(buffer2+old,buffer,bytes_read);
+        std::cout<<bytes<<std::endl;
+      }
+      buffer2[bytes] = '\0';
+
+      LNetMsg type = static_cast<LNetMsg>(buffer2[0]);
+      std::string message = &buffer2[1];
+
+      /* For testing only! */
+      std::cout<< type << "-" << message << std::endl;
+
+      delete buffer2;
+
+      //client_stream.write(buffer, bytes_read);
+
+
+
+      //std::cout << " client disconnected from server" << std::endl;
+
+    }
+  }
+  catch (std::exception &e)
+  {
+    std::cerr << e.what() << std::endl;
+  }
+
+}
