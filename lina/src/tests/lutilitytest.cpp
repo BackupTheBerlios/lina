@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <ldefault.h>
+#include <lrand.h>
 
 using namespace std;
 
@@ -37,7 +38,7 @@ LPtr<int> int_test(real_pointer);
 LDebug("23",*int_test);
 
 LPtr<long> long_test;
-LDebug("Is NULL",long_test.isNULL() ? "IS NULL" : "" );
+LDebug("Is NULL",long_test.IsNULL() ? "IS NULL" : "" );
 
 LPtr<char> char_test('a');
 LDebug("a",*char_test);
