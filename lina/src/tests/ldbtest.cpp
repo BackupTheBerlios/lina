@@ -26,14 +26,15 @@
 #include <iostream>
 #include <cstdlib>
 
-#include <ldatabase.h>
+#include <ldefault.h>
 
 using namespace std;
 
-LDatabase dbtest;
-
 int main(int argc, char *argv[])
 {
+
+LID* bla = new LID("bla","foo");
+
 
 cout<<"Test LDBPair:"<<endl;
     LDBPairSet ldbpairset;
@@ -42,18 +43,20 @@ cout<<"Test LDBPair:"<<endl;
     ldbpairset.insert(LDBPair("C",mid));
     ldbpairset.insert(LDBPair("D",high));
 
+LDebug("B\nC\nA","");
     for(LDBPairSet::iterator it = ldbpairset.begin(); it != ldbpairset.end(); ++it)
    {
    cout<<(*it).first<<endl;
    }
-cout<<"Expected output is:\nB\nC\nA"<<endl;
 
-dbtest.AddRoot("../../data/database/test/root1");
-dbtest.AddRoot("../../data/database/test/root2");
-dbtest.AddRoot("../../data/database/test/root3");
+
+
+LDB.AddRoot("../../data/database/test/root1");
+LDB.AddRoot("../../data/database/test/root2");
+LDB.AddRoot("../../data/database/test/root3");
 
 cout<<"\nTest database creation:"<<endl;
-if(dbtest.CreateRoot("/var/tmp/testdatabase"))
+if(LDB.CreateRoot("/var/tmp/testdatabase"))
 cout<<"PASSED!"<<endl;
 else
 cout<<"FAILED!"<<endl;
@@ -61,30 +64,32 @@ cout<<"FAILED!"<<endl;
 LID lidtest("player","ANDRZIEG");
 
 cout<<"Test database iteration:"<<endl;
-vector<LID> testvec;
-dbtest.IterateLIDs(lidtest.Catalog(),testvec);
-for(vector<LID>::iterator it = testvec.begin(); it != testvec.end(); ++it)
+set<LID> testvec;
+LDB.IterateLIDs(lidtest.Catalog(),testvec);
+for(set<LID>::iterator it = testvec.begin(); it != testvec.end(); ++it)
 {
 cout<<(*it).Token()<<endl;
 }
 
 cout<<"Test LID finding:"<<endl;
 testvec.clear();
-dbtest.FindLIDs(lidtest.Catalog(),"testdata","hallo wie gehts",testvec);
-for(vector<LID>::iterator it = testvec.begin(); it != testvec.end(); ++it)
+LDB.FindLIDs(lidtest.Catalog(),"testdata","hallo wie gehts",testvec);
+for(set<LID>::iterator it = testvec.begin(); it != testvec.end(); ++it)
 {
 cout<<(*it).Token()<<endl;
 }
 
-string res = dbtest.Read(LID("player","ANDRZIEG"),"mehrtestdata");
+string res = LDB.Read(LID("player","ANDRZIEG"),"mehrtestdata");
   cout <<"\n"<< res << endl;
-res = dbtest.Read(LID("player","ANDRZIEG"),"testdata");
+res = LDB.Read(LID("player","ANDRZIEG"),"testdata");
   cout <<"\n"<< res << endl;
 
-dbtest.Erase(LID("player","ANDRZIEG"),"testdata");
-dbtest.Write(LID("player","ANDRZIEG"),"testdata","crazy\\\ntest");
 
-LDatabase::LID_info info = dbtest.GetLIDInfo(LID("player","ANDRZIEG"));
+LDB.Erase(LID("player","ANDRZIEG"),"testdata");
+LDB.Write(LID("player","ANDRZIEG"),"testdata","crazy\\\ntest");
+
+
+LDatabase::LIDInfo info = LDB.GetLIDInfo(LID("player","ANDRZIEG"));
 
   for(LDBPairSet::iterator it = info.root_prio_set.begin(); it != info.root_prio_set.end(); ++it)
   {
@@ -92,8 +97,10 @@ LDatabase::LID_info info = dbtest.GetLIDInfo(LID("player","ANDRZIEG"));
   }
 
 LDBPairSet::iterator it = info.root_prio_set.find(LDBPair("",mid));
+if(it != info.root_prio_set.end())
+{
 cout<<"Mid: "<<(*it).first;
-
+}
 
   return EXIT_SUCCESS;
 }
