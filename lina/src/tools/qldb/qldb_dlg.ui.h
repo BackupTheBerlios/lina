@@ -243,7 +243,7 @@ void QLDB::import_template()
     {
     QFileInfo fi(filename);
     filename = fi.fileName();
-    LID template_LID("templates",filename);
+    LID template_LID("templates",filename.latin1());
 
     std::set<string> keys;
     int i=table->numRows();
