@@ -58,11 +58,13 @@ void QLDB::open_database_root()
   //read the priority
   QFile priofile(root.path()+"/prio");
   priofile.open( IO_ReadOnly );
-  int prio = priofile.getch() - 48;
+  QString tmp;
+  priofile.readLine(tmp,10);
   priofile.close();
-
+  int prio = tmp.toInt();
+  
   spinBox_prio->setValue(prio);
-  LDB.SetWriteFlag(static_cast<LDBPrio>(prio));
+  LDB.SetWriteFlag(prio);
   }
   else
   {
@@ -167,7 +169,7 @@ void QLDB::set_prio( int )
     //open the prio file for writing
     prio.open( IO_WriteOnly );
     //put the priority into it
-    prio.putch(spinBox_prio->value() + 48);
+    prio.writeBlock(QString::number(spinBox_prio->value()).latin1(),QString::number(spinBox_prio->value()).length());
     //close
     prio.close();
   }

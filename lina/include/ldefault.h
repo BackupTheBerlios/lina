@@ -18,9 +18,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <lconvert.h>
+#include <lrand.h>
+#include <lrange.h>
 #include <ldatabase.h>
 #include <lutility.h>
 #include <lcalendar.h>
+#include <lstadium.h>
+#include <lfootballstadium.h>
 
 LDatabase& LDB = LDatabase::Get();
 

@@ -26,11 +26,12 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
+
   LRange<char> test;
   test = 110;
-  LDebug(test);
+  LDebug(test,100);
   test -= 120;
-  LDebug(test);
+  LDebug(test,0);
 
   return EXIT_SUCCESS;
 }

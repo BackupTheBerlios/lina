@@ -32,6 +32,12 @@ long longer;
 int main(int argc, char *argv[])
 {
 
+LPtr<LID> test_lid(LID("bla","blub"));
+LPtr<LID> test_ptr_lid(test_lid);
+
+LPtr<int> int_test_test(123);
+LDebug("123",*int_test_test);
+
 int* real_pointer = new int;
 *real_pointer = 23;
 LPtr<int> int_test(real_pointer);

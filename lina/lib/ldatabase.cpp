@@ -27,16 +27,31 @@ LDatabase& LDatabaseInterface::LDB = LDatabase::Get();
 bool operator<(const LDBPair& lhs, const LDBPair& rhs) { return ( lhs.second > rhs.second); };
 bool operator>(const LDBPair& lhs, const LDBPair& rhs) { return ( lhs.second < rhs.second); };
 
-bool operator<(const LID& lhs, const LID& rhs) { return ( lhs.Catalog()+lhs.Token() > rhs.Catalog()+rhs.Token()); };
-bool operator>(const LID& lhs, const LID& rhs) { return ( lhs.Catalog()+lhs.Token() < rhs.Catalog()+rhs.Token()); };
+bool operator<(const LID& lhs, const LID& rhs) { return ( lhs.catalog + lhs.token < rhs.catalog + rhs.token); };
+bool operator>(const LID& lhs, const LID& rhs) { return ( lhs.catalog + lhs.token > rhs.catalog + rhs.token); };
 
 bool operator==(const LID& lhs, const LID& rhs)
 {
   return (lhs.Catalog() == rhs.Catalog() && lhs.Token() == rhs.Token() );
 }
 
+std::ostream& operator<<(std::ostream& os, const LID& rv)
+{
+  return os << rv.catalog << " " << rv.token;
+}
+
+std::istream& operator>>(std::istream& is, LID& rv)
+{
+  return is >> rv.catalog >> rv.token;
+}
+
 LID::LID(const string& lid_catalog, const string& lid_token) : catalog(lid_catalog),token(lid_token)
-{}
+{
+}
+
+LID::LID(const LID& lid) : catalog(lid.catalog),token(lid.token)
+{
+}
 
 LDatabase& LDatabase::Get()
 {
@@ -53,9 +68,12 @@ bool LDatabase::AddRoot(const string& db_root)
   if(db_root != "/" && file.is_open() )
   {
     //get the priority of this root
-    LDBPrio db_prio = static_cast<LDBPrio>(file.get() - 48);
-    if ( db_prio < low || db_prio > high)
-      db_prio = low;
+    char tmp[10];
+    file.getline(tmp,10);
+    LDBPrio db_prio;
+    LStringToDigit(db_prio,tmp);
+    if ( db_prio < 0 )
+      db_prio = 0;
     //finaly add this root to the database
     root_prio_set.insert(LDBPair(db_root,db_prio));
     return true;
@@ -125,7 +143,7 @@ const string LDatabase::Read(const LID& lid,const string& key) const
     {
       line=tmpline;
       line.erase(line.length()-1);
-      if((line.find(key+":") == 0 || multiline) && line[0] != '#' )
+      if(line.find(key+":") == 0 || multiline)
       {
 
         if(!multiline)
@@ -153,7 +171,91 @@ const string LDatabase::Read(const LID& lid,const string& key) const
   return "";
 }
 
-int LDatabase::ReadArray(const LID& lid,const string& key,vector<string>& value_vector) const
+void LDatabase::Read(const LID& lid,const string& key, string& value) const
+{
+
+  LIDInfo lid_info = GetLIDInfo(lid);
+  for( LDBPairSet::iterator it = lid_info.root_prio_set.begin(); it != lid_info.root_prio_set.end(); ++it )
+  {
+    gzFile file = gzopen((((*it).first+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"rb");
+
+    const short int MAXLINESIZE = 1024;
+
+    string line;
+    bool multiline = false;
+    for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != '\0' ; )
+    {
+      line=tmpline;
+      line.erase(line.length()-1);
+      if(line.find(key+":") == 0 || multiline)
+      {
+
+        if(!multiline)
+        {
+          value.insert(0,line,key.length()+1,line.length()-key.length());
+        }
+        else
+        {
+          value[value.length()-1]='\n';
+          value.insert(value.length(),line,0,line.length());
+        }
+
+        if(value[value.length()-1] != '\\' || value[value.length()-2] == '\\' )
+          break;
+        else
+          multiline = true;
+      }
+
+    }
+
+    gzclose(file);
+  }
+}
+
+void LDatabase::Read(const LID& lid,const string& key, stringstream& value) const
+{
+
+  LIDInfo lid_info = GetLIDInfo(lid);
+  for( LDBPairSet::iterator it = lid_info.root_prio_set.begin(); it != lid_info.root_prio_set.end(); ++it )
+  {
+    gzFile file = gzopen((((*it).first+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"rb");
+
+    const short int MAXLINESIZE = 1024;
+
+    string tmp;
+    string line;
+    bool multiline = false;
+    for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != '\0' ; )
+    {
+      line=tmpline;
+      line.erase(line.length()-1);
+      if(line.find(key+":") == 0 || multiline)
+      {
+
+        if(!multiline)
+        {
+          tmp.insert(0,line,key.length()+1,line.length()-key.length());
+        }
+        else
+        {
+          tmp[tmp.length()-1]='\n';
+          tmp.insert(tmp.length(),line,0,line.length());
+        }
+
+        if(tmp[tmp.length()-1] != '\\' || tmp[tmp.length()-2] == '\\' )
+          break;
+        else
+          multiline = true;
+      }
+
+    }
+
+    value<<tmp;
+    gzclose(file);
+  }
+}
+
+void LDatabase::ReadArray(const LID& lid,const string& key,vector<string>& value_vector) const
 {
   //get the plain value
   string value = Read(lid,key);
@@ -173,6 +275,22 @@ int LDatabase::ReadArray(const LID& lid,const string& key,vector<string>& value_
   }
 }
 
+int LDatabase::ReadArraySize(const LID& lid,const string& key) const
+{
+  //get the plain value
+  string value = Read(lid,key);
+
+  int i=0;
+  int pos=0;
+  //split it with '|' and push the parts to value_vector
+  while((pos = value.find('|',pos)) != string::npos)
+  {
+    pos+=1;
+    ++i;
+  }
+  return i;
+}
+
 int LDatabase::GetKeys(const LID& lid, set<string>& key_set) const
   {
     int keys=0;
@@ -190,7 +308,7 @@ int LDatabase::GetKeys(const LID& lid, set<string>& key_set) const
       {
         line=tmpline;
         string::size_type pos = line.find(":",0);
-        if(line[0] != '#' && (multiline || (pos != string::npos && (line[pos-1] != '\\' || line[pos-2] == '\\'))))
+        if(multiline || (pos != string::npos && (line[pos-1] != '\\' || line[pos-2] == '\\')))
         {
           if(multiline == false)
           {
@@ -226,7 +344,7 @@ void LDatabase::Erase(const LID& lid,const string& key) const
     for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != '\0' ; )
     {
       line=tmpline;
-      if(((line.find(key+":") == 0 || multiline) && line[0] != '#' ))
+      if(line.find(key+":") == 0 || multiline)
       {
         if(line[line.length()-3] != '\\' && line[line.length()-2] == '\\')
           multiline = true;
@@ -243,12 +361,13 @@ void LDatabase::Erase(const LID& lid,const string& key) const
     if(data.length())
     {
       file = gzopen((((*it).first+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"w");
-      gzwrite(file, const_cast<char*>(data.c_str()), data.length()-1);
+      gzwrite(file, const_cast<char*>(data.c_str()), data.length());
       gzclose(file);
     }
 
   }
 }
+
 
 void LDatabase::Write(const LID& lid, const string& key, const string& value) const
 {
@@ -261,7 +380,26 @@ void LDatabase::Write(const LID& lid, const string& key, const string& value) co
     //open the file for appending
     gzFile file = gzopen((((*it).first+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"ab");
     //create data and write it to the filestream
-    string data = '\n' + key + ':' + value + '\n';
+    string data = key + ':' + value + '\n';
+    gzwrite(file, const_cast<char*>(data.c_str()), data.length());
+    //close
+    gzclose(file);
+  }
+}
+
+
+void LDatabase::Write(const LID& lid, const string& key, const stringstream& value) const
+{
+  //erase the current appearances of key
+  Erase(lid,key);
+
+  LDBPairSet::iterator it = root_prio_set.find(LDBPair("",write_flag));
+  if ( it != root_prio_set.end() )
+  {
+    //open the file for appending
+    gzFile file = gzopen((((*it).first+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"ab");
+    //create data and write it to the filestream
+    string data = key + ':' + value.str() + '\n';
     gzwrite(file, const_cast<char*>(data.c_str()), data.length());
     //close
     gzclose(file);
@@ -412,8 +550,8 @@ LDatabase::LIDInfo LDatabase::GetLIDInfo(const LID& lid) const
 
 void LDatabaseInterface::MakeLazy(void* address)
 {
-if(lazy_members.find(address) == lazy_members.end())
-{
-lazy_members.insert(address);
-}
+  if(lazy_members.find(address) == lazy_members.end())
+  {
+    lazy_members.insert(address);
+  }
 }

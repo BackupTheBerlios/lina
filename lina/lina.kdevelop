@@ -33,6 +33,7 @@
         <ldbtest/>
         <qldb/>
         <lutilitytest/>
+        <lconvtest/>
       </runarguments>
     </run>
     <configurations>

@@ -74,7 +74,7 @@ class LRange
       /// Returns an integer value.
       /** Possibility to return an integer
           where no integer value is given. */
-      operator int() { return value; }
+      operator T() { return value; }
 };
 
 typedef LRange<char> LRangeC;

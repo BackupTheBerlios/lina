@@ -44,6 +44,7 @@ friend LPoint Middle(const LPoint&, const LPoint&);
 friend float Distance(const LPoint&, const LPoint&);
 
 public:
+LPoint() : x(0),y(0) {};
 /// Constructor.
 LPoint(float coord_x, float coord_y) : x(coord_x),y(coord_y) {};
 /// Copy-constructor.

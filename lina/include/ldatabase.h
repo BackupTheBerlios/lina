@@ -34,15 +34,26 @@
 #include <cstdio>
 #include <cerrno>
 #include <lconvert.h>
+#include <lutility.h>
 
 /// LINA ID
 /** This class stores a unique ID,
     wich can't be changed during the runtime. */
 class LID
 {
+  friend std::ostream &operator<<(std::ostream&, const LID&);
+  friend std::istream &operator>>(std::istream& is, LID&);
+
+  friend bool operator<(const LID& lhs, const LID& rhs);
+  friend bool operator>(const LID& lhs, const LID& rhs);
+  
 public:
   /// Constructor
   LID(const std::string& lid_catalog, const std::string& lid_token);
+  /// Copy constructor
+  LID(const LID& lid);  
+  /// Destructor
+  ~LID() {  };
 
   const std::string ID() const { return catalog+token; };
   const std::string Catalog() const { return catalog; };
@@ -64,7 +75,7 @@ private:
 bool operator==(const LID& lhs, const LID& rhs);
 
 /// Enum representing priorities.
-enum LDBPrio{low,mid,high};
+typedef int LDBPrio;
 
 /// Pair for a database root and its priority.
 struct LDBPair
@@ -93,7 +104,27 @@ public:
 
   /// Read value from LID of the database.
   /** Read the key's value from the database.*/
-  int ReadArray(const LID& lid, const std::string& key, std::vector<std::string>& value_vector) const;
+  void Read(const LID& lid, const std::string& key, std::string& value) const;
+
+  /// Read value from LID of the database.
+  /** Read the key's value from the database.*/
+  void Read(const LID& lid, const std::string& key, std::stringstream& value) const;
+
+  /// Read value from LID of the database.
+  /** Read the key's value from the database.*/
+  template<class T> void Read(const LID& lid, const std::string& key, T& value) const;
+
+  /// Read array from LID of the database.
+  /** Read the key's array from the database.*/
+  void ReadArray(const LID& lid, const std::string& key, std::vector<std::string>& value_vector) const;
+
+  /// Read array from LID of the database.
+  /** Read the key's array from the database.*/
+  template<class T,class Cont> void ReadArray(const LID& lid, const std::string& key, Cont& cont) const;
+
+  /// Read size of array from LID of the database.
+  /** Read the key's array size from the database.*/
+  int ReadArraySize(const LID& lid, const std::string& key) const;
 
   /// Erase a key from a LID.
   /** Erases a key completly in a certain LID.*/
@@ -105,20 +136,19 @@ public:
 
   /// Write values to a LID of the database.
   /** Write the key and value to the database.*/
-  template<class IT>
-  void WriteArray(const LID& lid, const std::string& key, IT begin, const IT end) const
-  {
-    std::string value;
-    while(begin!=end)
-    {
-      value += (*begin) + '|';
-      begin++;
-    }
-    Write(lid,key,value);
-  }
+  void Write(const LID& lid, const std::string& key, const std::stringstream& value) const;
 
-  /// Write values to a LID of the database.
-  /** Write the key and value to the database.*/
+  /// Write array to a LID of the database.
+  /** Write the key and array to the database.*/
+  template<class T> void Write(const LID& lid, const std::string& key, const T& value) const;
+
+  /// Write array to a LID of the database.
+  /** Write the key and array to the database.*/
+  template<class IT>
+  void WriteArray(const LID& lid, const std::string& key, IT begin, const IT end) const;
+
+  /// Write array to a LID of the database.
+  /** Write the key and array to the database.*/
   template<class Cont>
   void WriteArray(const LID& lid, const std::string& key, const Cont& cont) const { WriteArray(lid,key,cont.begin(),cont.end()); }
 
@@ -145,7 +175,7 @@ public:
 
   /// Create a new database root.
   /** Returns false if it failes. */
-  bool CreateRoot(const std::string& db_root,enum LDBPrio=low);
+  bool CreateRoot(const std::string& db_root, LDBPrio=0);
 
   /// Clear the database roots
   void Clear();
@@ -153,7 +183,7 @@ public:
   /// Set write_flag
   /** The write_flag defines to which database priority
       data may be written currently.*/
-void SetWriteFlag(enum LDBPrio prio=high) { write_flag=prio; };
+void SetWriteFlag(LDBPrio prio) { write_flag=prio; };
 
   /// Information about a LID.
   /** Contains information about a LID.*/
@@ -170,8 +200,8 @@ void SetWriteFlag(enum LDBPrio prio=high) { write_flag=prio; };
 
 private:
   /// Default constructor.
-  LDatabase() : write_flag(high) {};
-  // Clean a lid from unparsed data TODO
+  LDatabase() : write_flag(2) {};
+  // Clean a lid from unparseable data TODO
   void Clean(const LID& lid) const;
   // Test if a file exists.
   bool Fexists(const std::string& filename) const;
@@ -214,35 +244,51 @@ protected:
 
   ///Reads data of the database, if ref isn't marked as lazy.
   template<class T>
-  void LazyGet(std::string& ref, const std::string& key);
+  void LazyGet(const std::string& key, std::string& ref);
 
   ///Reads data of the database, if ref isn't marked as lazy.
   template<class T>
-  void LazyGet(std::string*& ref, const std::string& key);
+  void LazyGet(const std::string& key, std::string*& ref);
 
   ///Reads data of the database, if ref isn't marked as lazy.
   template<class T>
-  void LazyGet(T& ref, const std::string& key);
+  void LazyGet(const std::string& key, T& ref);
 
   ///Reads data of the database, if ref isn't marked as lazy.
   template<class T>
-  void LazyGet(T*& ref, const std::string& key);
+  void LazyGet(const std::string& key, T*& ref);
 
   ///Writes data to the database, if ref is marked as lazy.
   template<class T>
-  void LazySave(const T& ref, const std::string& key) const;
+  void LazySave(const std::string& key, const T& ref) const;
 
   ///Writes data to the database, if ref is marked as lazy.
   template<class T>
-  void LazySave(const T*& ref, const std::string& key) const;
+  void LazySave(const std::string& key, const T*& ref) const;
 
   ///Writes data to the database, if ref is marked as lazy.
   template<class T>
-  void LazySave(const std::string& ref, const std::string& key) const;
+  void LazySave(const std::string& key, const std::string& ref) const;
 
   ///Writes data to the database, if ref is marked as lazy.
   template<class T>
-  void LazySave(const std::string*& ref, const std::string& key) const;
+  void LazySave(const std::string& key, const std::string*& ref) const;
+  
+  ///Writes data to the database, if ref is marked as lazy.
+  template<class IT>
+  void LazySaveArray(const std::string& key, const void* ref, IT begin, IT end) const;
+
+  ///Writes data to the database, if ref is marked as lazy.
+  template<class Cont>
+  void LazySaveArray(const std::string& key, const Cont& ref) const;
+
+/*  ///Writes data to the database, if ref is marked as lazy.
+  template<class T>
+  void LazyGetArray(const std::string& key, const std::string& ref) const;
+
+  ///Writes data to the database, if ref is marked as lazy.
+  template<class T>
+  void LazySaveArray(const std::string*& ref, const std::string& key) const;*/
 
   /// Static reference to LDatabase object.
   static LDatabase& LDB;

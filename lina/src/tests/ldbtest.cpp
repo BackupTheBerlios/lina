@@ -25,10 +25,14 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <iterator>
+#include <deque>
 
 #include <ldefault.h>
+#include <lmetrics.h>
 
 using namespace std;
+
 
 int main(int argc, char *argv[])
 {
@@ -38,10 +42,10 @@ LID* bla = new LID("bla","foo");
 
 cout<<"Test LDBPair:"<<endl;
     LDBPairSet ldbpairset;
-    ldbpairset.insert(LDBPair("A",low));
-    ldbpairset.insert(LDBPair("B",high));
-    ldbpairset.insert(LDBPair("C",mid));
-    ldbpairset.insert(LDBPair("D",high));
+    ldbpairset.insert(LDBPair("A",0));
+    ldbpairset.insert(LDBPair("B",2));
+    ldbpairset.insert(LDBPair("C",1));
+    ldbpairset.insert(LDBPair("D",2));
 
 LDebug("B\nC\nA","");
     for(LDBPairSet::iterator it = ldbpairset.begin(); it != ldbpairset.end(); ++it)
@@ -80,7 +84,7 @@ cout<<(*it).Token()<<endl;
 }
 
 string res = LDB.Read(LID("player","ANDRZIEG"),"mehrtestdata");
-  cout <<"\n"<< res << endl;
+  cout <<"\n"<< res << "MTD" << endl;
 res = LDB.Read(LID("player","ANDRZIEG"),"testdata");
   cout <<"\n"<< res << endl;
 
@@ -96,11 +100,60 @@ LDatabase::LIDInfo info = LDB.GetLIDInfo(LID("player","ANDRZIEG"));
       cout<<"Root: "<<(*it).first<<endl<<"With prio: "<<(*it).second<<endl;
   }
 
-LDBPairSet::iterator it = info.root_prio_set.find(LDBPair("",mid));
+LDBPairSet::iterator it = info.root_prio_set.find(LDBPair("",1));
 if(it != info.root_prio_set.end())
 {
 cout<<"Mid: "<<(*it).first;
 }
+
+vector<int> int_v;
+int_v.push_back(123);
+int_v.push_back(321);
+int_v.push_back(456);
+LDB.WriteArray(LID("player","extrem"),"cool",int_v);
+
+int sizes = LDB.ReadArraySize(LID("player","extrem"),"cool");
+LDebug("3",sizes);
+
+int woa = 1232;
+LDB.Write(LID("player","extrem"),"uncool",woa);
+
+int int_vr;
+LDB.Read(LID("player","extrem"),"uncool",int_vr);
+LDebug(woa,int_vr);
+
+
+vector<float> isset;
+LDB.ReadArray<float>(LID("player","extrem"),"cool",isset);
+
+   for(vector<float>::iterator it = isset.begin(); it != isset.end(); ++it)
+   {
+   cout<<(*it)<<endl;
+   }
+   
+   
+LPoint anti_plan;
+LDB.Read(LID("player","extrem"),"fly",anti_plan);
+LDebug(anti_plan);
+LPoint advanced(4, 1. / 2. );
+LDB.Write(LID("player","extrem"),"fly",advanced);
+   
+ /*while (!isset.empty() )
+ {
+   cout <<"the last element is: "<< isset.front() << endl; //front() returns 
+                                                        //the top-most element
+  isset.pop(); //remove the top-most element
+ }*/
+   
+float suppa[3];
+
+/*LDB.ReadArray<float>(LID("player","extrem"),"cool",suppa);
+
+   cout<<suppa[0]<<endl;
+   cout<<suppa[1]<<endl;
+   cout<<suppa[2]<<endl;   */
+   
+delete bla;
 
   return EXIT_SUCCESS;
 }

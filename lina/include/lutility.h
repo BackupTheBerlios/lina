@@ -65,7 +65,7 @@ public:
     pointee = new T(value);
   };
   /// Copy-constructor
-  LPtr(const LPtr& rhs) : pointee(rhs) {};
+  LPtr(LPtr& rhs) : pointee(rhs.pointee) { rhs.pointee = 0; };
   /// Destructor
   ~LPtr() { delete pointee; };
   /// Operator=

@@ -5,4 +5,4 @@ if WANT_QLDB
 QLDB_DIR = qldb
 endif
 
-SUBDIRS =  $(QLDB_DIR)
+SUBDIRS = $(QLDB_DIR) template_gen
