@@ -22,7 +22,7 @@
 #define LRAND_H
 
 // Not thread safe (unless auto-initialization is avoided and each thread has
-// its own LRand object)
+// its own Random object)
 
 #include <iostream>
 #include <limits.h>
@@ -36,7 +36,10 @@
     are far greater.  The generator is also fast; it avoids multiplication and
     division, and it benefits from caches and pipelines.  For more information
     see the inventors' web page at http://www.math.keio.ac.jp/~matumoto/emt.html */
-class LRand {
+
+namespace LINA {
+
+class Random {
 // Data
 public:
 	typedef unsigned long uint32;  // unsigned integer type, at least 32 bits
@@ -56,13 +59,13 @@ protected:
 public:
 	/// Constructor.
 	/** Initialize with a simple uint32. */
-	LRand( const uint32& oneSeed );
+	Random( const uint32& oneSeed );
 	/// Constructor.
 	/** Initialize with an array. */
-	LRand( uint32 *const bigSeed, uint32 const seedLength = N );
+	Random( uint32 *const bigSeed, uint32 const seedLength = N );
 	/// Constructor.
 	/** Auto-initialize with /dev/urandom or time() and clock().*/
-	LRand();
+	Random();
 
 	// Do NOT use for CRYPTOGRAPHY without securely hashing several returned
 	// values together, otherwise the generator state can be learned after
@@ -109,9 +112,9 @@ public:
 	/** From such array */
 	void Load( uint32 *const loadArray );
 	/// Ostream operator.
-	friend std::ostream& operator<<( std::ostream& os, const LRand& lrand );
+	friend std::ostream& operator<<( std::ostream& os, const Random& lrand );
 	/// Istream operator.
-	friend std::istream& operator>>( std::istream& is, LRand& lrand );
+	friend std::istream& operator>>( std::istream& is, Random& lrand );
 
 protected:
 	void Initialize( const uint32 oneSeed );
@@ -127,40 +130,40 @@ protected:
 };
 
 
-inline LRand::LRand( const uint32& oneSeed )
+inline Random::Random( const uint32& oneSeed )
 	{ Seed(oneSeed); }
 
-inline LRand::LRand( uint32 *const bigSeed, const uint32 seedLength )
+inline Random::Random( uint32 *const bigSeed, const uint32 seedLength )
 	{ Seed(bigSeed,seedLength); }
 
-inline LRand::LRand()
+inline Random::Random()
 	{ Seed(); }
 
-inline double LRand::Rand()
+inline double Random::Rand()
 	{ return double(RandInt()) * (1.0/4294967295.0); }
 
-inline double LRand::Rand( const double& n )
+inline double Random::Rand( const double& n )
 	{ return Rand() * n; }
 
-inline double LRand::RandExc()
+inline double Random::RandExc()
 	{ return double(RandInt()) * (1.0/4294967296.0); }
 
-inline double LRand::RandExc( const double& n )
+inline double Random::RandExc( const double& n )
 	{ return RandExc() * n; }
 
-inline double LRand::RandDblExc()
+inline double Random::RandDblExc()
 	{ return ( double(RandInt()) + 0.5 ) * (1.0/4294967296.0); }
 
-inline double LRand::RandDblExc( const double& n )
+inline double Random::RandDblExc( const double& n )
 	{ return RandDblExc() * n; }
 
-inline double LRand::Rand53()
+inline double Random::Rand53()
 {
 	uint32 a = RandInt() >> 5, b = RandInt() >> 6;
 	return ( a * 67108864.0 + b ) * (1.0/9007199254740992.0);  // by Isaku Wada
 }
 
-inline double LRand::RandNorm( const double& mean, const double& variance )
+inline double Random::RandNorm( const double& mean, const double& variance )
 {
 	// Return a real number from a normal (Gaussian) distribution with given
 	// mean and variance by Box-Muller method
@@ -169,7 +172,7 @@ inline double LRand::RandNorm( const double& mean, const double& variance )
 	return mean + r * cos(phi);
 }
 
-inline LRand::uint32 LRand::RandInt()
+inline Random::uint32 Random::RandInt()
 {
 	// Pull a 32-bit integer from the generator state
 	// Every other access function simply transforms the numbers extracted here
@@ -185,7 +188,7 @@ inline LRand::uint32 LRand::RandInt()
 	return ( s1 ^ (s1 >> 18) );
 }
 
-inline LRand::uint32 LRand::RandInt( const uint32& n )
+inline Random::uint32 Random::RandInt( const uint32& n )
 {
 	// Find which bits are used in n
 	// Optimized by Magnus Jonsson (magnus@smartelectronix.com)
@@ -205,7 +208,7 @@ inline LRand::uint32 LRand::RandInt( const uint32& n )
 }
 
 
-inline void LRand::Seed( const uint32 oneSeed )
+inline void Random::Seed( const uint32 oneSeed )
 {
 	// Seed the generator with a simple uint32
 	Initialize(oneSeed);
@@ -213,7 +216,7 @@ inline void LRand::Seed( const uint32 oneSeed )
 }
 
 
-inline void LRand::Seed( uint32 *const bigSeed, const uint32 seedLength )
+inline void Random::Seed( uint32 *const bigSeed, const uint32 seedLength )
 {
 	// Seed the generator with an array of uint32's
 	// There are 2^19937-1 possible initial states.  This function allows
@@ -249,7 +252,7 @@ inline void LRand::Seed( uint32 *const bigSeed, const uint32 seedLength )
 }
 
 
-inline void LRand::Seed()
+inline void Random::Seed()
 {
 	// Seed the generator with an array from /dev/urandom if available
 	// Otherwise use a hash of time() and clock() values
@@ -273,7 +276,7 @@ inline void LRand::Seed()
 }
 
 
-inline void LRand::Initialize( const uint32 seed )
+inline void Random::Initialize( const uint32 seed )
 {
 	// Initialize generator state with seed
 	// See Knuth TAOCP Vol 2, 3rd Ed, p.106 for multiplier.
@@ -291,7 +294,7 @@ inline void LRand::Initialize( const uint32 seed )
 }
 
 
-inline void LRand::Reload()
+inline void Random::Reload()
 {
 	// Generate N new values in state
 	// Made clearer and faster by Matthew Bellew (matthew.bellew@home.com)
@@ -307,7 +310,7 @@ inline void LRand::Reload()
 }
 
 
-inline LRand::uint32 LRand::Hash( time_t t, clock_t c )
+inline Random::uint32 Random::Hash( time_t t, clock_t c )
 {
 	// Get a uint32 from t and c
 	// Better than uint32(x) in case x is floating point in [0,1]
@@ -333,7 +336,7 @@ inline LRand::uint32 LRand::Hash( time_t t, clock_t c )
 }
 
 
-inline void LRand::Save( uint32* saveArray ) const
+inline void Random::Save( uint32* saveArray ) const
 {
 	register uint32 *sa = saveArray;
 	register const uint32 *s = state;
@@ -343,7 +346,7 @@ inline void LRand::Save( uint32* saveArray ) const
 }
 
 
-inline void LRand::Load( uint32 *const loadArray )
+inline void Random::Load( uint32 *const loadArray )
 {
 	register uint32 *s = state;
 	register uint32 *la = loadArray;
@@ -354,23 +357,25 @@ inline void LRand::Load( uint32 *const loadArray )
 }
 
 
-inline std::ostream& operator<<( std::ostream& os, const LRand& lrand )
+inline std::ostream& operator<<( std::ostream& os, const Random& lrand )
 {
-	register const LRand::uint32 *s = lrand.state;
+	register const Random::uint32 *s = lrand.state;
 	register int i = lrand.N;
 	for( ; i--; os << *s++ << "\t" ) {}
 	return os << lrand.left;
 }
 
 
-inline std::istream& operator>>( std::istream& is, LRand& lrand )
+inline std::istream& operator>>( std::istream& is, Random& lrand )
 {
-	register LRand::uint32 *s = lrand.state;
+	register Random::uint32 *s = lrand.state;
 	register int i = lrand.N;
 	for( ; i--; is >> *s++ ) {}
 	is >> lrand.left;
 	lrand.pNext = &lrand.state[lrand.N-lrand.left];
 	return is;
 }
+
+} // end LINA namespace
 
 #endif  // LRAND_H

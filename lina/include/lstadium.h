@@ -25,10 +25,12 @@
 #include <lrange.h>
 #include <lcalendar.h>
 
-class LTribune : public LDatabaseInterface
+namespace LINA {
+
+class Tribune : public DatabaseInterface
 {
 public:
-  LTribune(const LID& lid,const std::string& section="") : LDatabaseInterface(lid,section) {};
+  Tribune(const ID& lid,const std::string& section="") : DatabaseInterface(lid,section) {};
   virtual void Save() const;
   void SetCondition(const int set_condition) { MakeLazy(&condition); condition = set_condition; };
   int Condition() {  LazyGet("condition",condition); return condition; };
@@ -36,7 +38,7 @@ public:
   int Capacity() { LazyGet("capacity",capacity); return capacity; };
 
 private:
-  LRangeC condition;
+  RangeC condition;
   int capacity;
   int capacity_limit;
   bool roofed;
@@ -44,38 +46,40 @@ private:
 };
 
 ///Represents a sport stadium
-class LStadium : public LDatabaseInterface , LEventInterface
+class Stadium : public DatabaseInterface , EventInterface
 {
 public:
-  LStadium(const LID& lid);
-  virtual ~LStadium() {};
+  Stadium(const ID& lid);
+  virtual ~Stadium() {};
   virtual void Save() const;
   void SetName(const std::string& set_name) { MakeLazy(&name); name = set_name; };
   std::string Name() { LazyGet("name",name); return name; };
-  LEvent& TESTMakeDuper()
+  Event& TESTMakeDuper()
   {
-    LEvent ev(LTime(2003,12,8),LTime(2003,12,10),LEventID(my_LID,2));
+    Event ev(Time(2003,12,8),Time(2003,12,10),LEventID(my_LID,2));
   }
-  virtual void HandleEvent(const LEvent& levent)
+  virtual void HandleEvent(const Event& levent)
   {
     switch(levent.EventID())
     {
-    case 2: LDebug("Stadion -2- Action!"); break;
-    case 3: LDebug("Stadion -3- ction!"); break;
-    case 4: LDebug("Stadion -4- Action!"); break;
-    default: LDebug("Stadion -default- NETT!"); break;
+    case 2: Debug("Stadion -2- Action!"); break;
+    case 3: Debug("Stadion -3- ction!"); break;
+    case 4: Debug("Stadion -4- Action!"); break;
+    default: Debug("Stadion -default- NETT!"); break;
     }
 
   }
 
 private:
-  struct LAdmissionCharge
+  struct AdmissionCharge
   {
   }
   admission_charge;
   std::string name;
-  LRangeC popularity;
+  RangeC popularity;
   int max_spectators;
 };
+
+} // end LINA namespace
 
 #endif //LSTADIUM_H

@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>851</width>
-            <height>670</height>
+            <height>672</height>
         </rect>
     </property>
     <property name="caption">
@@ -42,6 +42,9 @@
             </property>
             <property name="wordWrap">
                 <enum>WidgetWidth</enum>
+            </property>
+            <property name="readOnly">
+                <bool>true</bool>
             </property>
         </widget>
         <widget class="QListBox" row="1" column="2">
@@ -128,12 +131,12 @@
 </includes>
 <slots>
     <slot>send_message()</slot>
-    <slot>set_nick( std::string new_nick )</slot>
+    <slot>set_nick( QString new_nick )</slot>
     <slot>receive_messages()</slot>
 </slots>
 <functions>
     <function>init()</function>
-    <function>set_server( std::string server )</function>
+    <function>set_server( QString server )</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

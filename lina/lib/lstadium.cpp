@@ -20,16 +20,16 @@
 
 #include <lstadium.h>
 
-void LTribune::Save() const
+void LINA::Tribune::Save() const
 {
 LazySave("capacity",capacity);
 }
 
-LStadium::LStadium(const LID& lid) : LDatabaseInterface(lid)
+LINA::Stadium::Stadium(const LINA::ID& lid) : LINA::DatabaseInterface(lid)
 {
 }
 
-void LStadium::Save() const
+void LINA::Stadium::Save() const
 {
 LazySave(name,"name");
 }

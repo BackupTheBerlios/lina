@@ -21,10 +21,14 @@
 #ifndef LMATCH_H
 #define LMATCH_H
 
+namespace LINA {
+
 class LMatch
 {
 public:
 private:
 };
+
+} // end LINA namespace
 
 #endif //LMATCH_H

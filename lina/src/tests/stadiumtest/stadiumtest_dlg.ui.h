@@ -11,16 +11,17 @@
 #include <ldefault.h>
 
 using namespace std;
+using namespace LINA;
 
-LLeague stadium_legue(LID("league","stadiumtest"));
-LStadium my_stadium(LID("stadium","test0"));
-std::vector<LStadium*> opponents;
+League stadium_legue(ID("league","stadiumtest"));
+Stadium my_stadium(ID("stadium","test0"));
+std::vector<Stadium*> opponents;
 
 void StadiumTest::play_round()
 {
-LRand random;
+LINA::Random random;
 int i;
-for(std::vector<LStadium*>::iterator it = opponents.begin(); it != opponents.end(); ++it)
+for(std::vector<Stadium*>::iterator it = opponents.begin(); it != opponents.end(); ++it)
 {
 //i = random.Rand((*it)->max_spectators);
 
@@ -33,10 +34,10 @@ void StadiumTest::start_game()
 {
 //Generate 5 opponents
 
-opponents.push_back(new LStadium(LID("stadium","test1")));
-opponents.push_back(new LStadium(LID("stadium","test2")));
-opponents.push_back(new LStadium(LID("stadium","test3")));
-opponents.push_back(new LStadium(LID("stadium","test4")));
-opponents.push_back(new LStadium(LID("stadium","test5")));
+opponents.push_back(new Stadium(ID("stadium","test1")));
+opponents.push_back(new Stadium(ID("stadium","test2")));
+opponents.push_back(new Stadium(ID("stadium","test3")));
+opponents.push_back(new Stadium(ID("stadium","test4")));
+opponents.push_back(new Stadium(ID("stadium","test5")));
 
 }

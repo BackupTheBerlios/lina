@@ -29,41 +29,43 @@
 #include <lrange.h>
 #include <list>
 
-class LTimePeriod;
+namespace LINA {
+
+class TimePeriod;
 
 /// Time and date class.
-/** LTime is LINA's time and date type and designed
+/** Time is LINA's time and date type and designed
     for the needs of LINA.*/
-class LTime
+class Time
 {
-  friend std::ostream &operator<<(std::ostream&, const LTimePeriod&);
-  friend std::istream &operator>>(std::istream& is, LTimePeriod&);
-  friend std::ostream &operator<<(std::ostream&, const LTime&);
-  friend std::istream &operator>>(std::istream& is, LTime&);
+  friend std::ostream &operator<<(std::ostream&, const TimePeriod&);
+  friend std::istream &operator>>(std::istream& is, TimePeriod&);
+  friend std::ostream &operator<<(std::ostream&, const Time&);
+  friend std::istream &operator>>(std::istream& is, Time&);
 
-  friend bool operator<(const LTime& lhs, const LTime& rhs);
-  friend bool operator>(const LTime& lhs, const LTime& rhs);
+  friend bool operator<(const Time& lhs, const Time& rhs);
+  friend bool operator>(const Time& lhs, const Time& rhs);
 
-  friend bool operator>=(const LTime& lhs, const LTime& rhs);
-  friend bool operator==(const LTime& lhs, const LTime& rhs);
+  friend bool operator>=(const Time& lhs, const Time& rhs);
+  friend bool operator==(const Time& lhs, const Time& rhs);
 
 public:
   /// Default constructor
-  LTime() : seconds(0), julian(0) {};
+  Time() : seconds(0), julian(0) {};
   /// Copy constructor
-  LTime(const LTime& ltime);
+  Time(const Time& ltime);
   /// Constructor
-  LTime(int year, int month, int day, int hour, int minute, int second);
+  Time(int year, int month, int day, int hour, int minute, int second);
   /// Constructor
-  LTime(int year, int month, int day);
+  Time(int year, int month, int day);
   /*/// Constructor
-  LTime(int year, int week, int weekday);*/
+  Time(int year, int week, int weekday);*/
   /// Constructor
   /** Takes a struct tm object*/
-  LTime(struct tm *dt);
+  Time(struct tm *dt);
   /// Constructor
   /** Takes a time_t object*/
-  LTime(time_t time);
+  Time(time_t time);
 
   /// Set year, month and day
   bool SetYMD( int year, int month, int day );
@@ -114,9 +116,9 @@ public:
   bool LeapYear(int year) const;
   
   /// Days to a certain time.
-  int DaysTo(const LTime& to);
+  int DaysTo(const Time& to);
   /// Seconds to a certain time.
-  int SecondsTo(const LTime& to);
+  int SecondsTo(const Time& to);
   
 private:
   // Convert hour, minute and second to seconds
@@ -144,33 +146,36 @@ private:
 /// Represents a time period.
 /** This class holds a start and an end time.
     It provides some manipulation functions.*/
-class LTimePeriod
+class TimePeriod
 {
   /// Operators << and >>.
   /** Makes `cout' and `cin' operations
-      possible with LRange. */
-  friend std::ostream &operator<<(std::ostream&, const LTimePeriod&);
-  friend std::istream &operator>>(std::istream& is, LTimePeriod&);
+      possible with Range. */
+  friend std::ostream &operator<<(std::ostream&, const TimePeriod&);
+  friend std::istream &operator>>(std::istream& is, TimePeriod&);
 
 public:
-  LTimePeriod(const LTime& tp_start,const LTime& tp_end) : start(tp_start),end(tp_end) {};
+  TimePeriod(const Time& tp_start,const Time& tp_end) : start(tp_start),end(tp_end) {};
 
-  LTime start;
-  LTime end;
+  Time start;
+  Time end;
 
 };
+
+// FIXME LEventID is now LINA::LEventID because the get method for the event_id
+// is already called EventID
 
 /// Represents an event.
 /** An event is a time period, that is connected with a certain lid
     and another id, which represents the real event.*/
-class LEvent : public LTimePeriod
+class Event : public TimePeriod
 {
 
-  friend std::ostream &operator<<(std::ostream&, const LEvent&);
-  friend std::istream &operator>>(std::istream& is, LEvent&);
+  friend std::ostream &operator<<(std::ostream&, const Event&);
+  friend std::istream &operator>>(std::istream& is, Event&);
 
-  friend bool operator<(const LEvent& lhs, const LEvent& rhs);
-  friend bool operator>(const LEvent& lhs, const LEvent& rhs);
+  friend bool operator<(const Event& lhs, const Event& rhs);
+  friend bool operator>(const Event& lhs, const Event& rhs);
 
 public:
 
@@ -178,23 +183,23 @@ public:
   struct LEventID;
 
   /// Constructor.
-  LEvent(const LTime& tp_start,const LTime& tp_end,const LEventID& event_id) : LTimePeriod(tp_start,tp_end),event_id(event_id)  { }
+  Event(const Time& tp_start,const Time& tp_end,const LEventID& event_id) : TimePeriod(tp_start,tp_end),event_id(event_id)  { }
   /// Copy constructor.
-  LEvent(const LEvent& levent) : LTimePeriod(levent.start,levent.end),event_id(levent.event_id)
+  Event(const Event& levent) : TimePeriod(levent.start,levent.end),event_id(levent.event_id)
   {}
   /// Destructor.
-  ~LEvent() {}
+  ~Event() {}
   /// Get event ID.
   int EventID() const { return event_id.id; }
   /// Get event LID.
-  LID EventLID() const { return *event_id.lid; }
+  ID EventLID() const { return *event_id.lid; }
 
   /// A structure  to store an event id/lid
   struct LEventID
   {
     LEventID(const LEventID& leventid) : lid(*leventid.lid), id(leventid.id) {}
-    LEventID(const LID& _lid, int _id) :lid(_lid),id(_id) {};
-    LPtr<LID> lid;
+    LEventID(const ID& _lid, int _id) :lid(_lid),id(_id) {};
+    Ptr<ID> lid;
     int id;
   };
 
@@ -203,49 +208,50 @@ private:
   LEventID event_id;
 };
 
-typedef LEvent::LEventID LEventID;
+typedef Event::LEventID LEventID;
 
-class LEventInterface
+class EventInterface
 {
 
 public:
-  virtual void HandleEvent(const LEvent& levent) = 0;
+  virtual void HandleEvent(const Event& levent) = 0;
 
 };
 
 enum EventStatusEnum { EventNotStarted, EventStart, EventOngoing, EventEnd, EventFinished};
 
 /// Controls events.
-class LCalendar : public LDatabaseInterface
+class Calendar : public DatabaseInterface
 {
 public:
-  LCalendar(const LID& lid) : LDatabaseInterface(lid) {};
-  LCalendar(const LID& lid,const LTime& cur) : LDatabaseInterface(lid) { MakeLazy(&current_time); current_time = cur; };
+  Calendar(const ID& lid) : DatabaseInterface(lid) {};
+  Calendar(const ID& lid,const Time& cur) : DatabaseInterface(lid) { MakeLazy(&current_time); current_time = cur; };
   virtual void Save() const;
 
   /// Return pointer to next event
-  LEvent* NextEvent()
+  Event* NextEvent()
   {
-    return const_cast<LEvent*>(&(*event_list.begin()));
+    return const_cast<Event*>(&(*event_list.begin()));
   }
 
   /// Return the current calendar time
-  LTime CurrentTime() { LazyGet("current_time",current_time); return current_time; };
-  bool InsertEvent(const LEvent& event)
+  Time CurrentTime() { LazyGet("current_time",current_time); return current_time; };
+  bool InsertEvent(const Event& event)
   {
     event_list.insert(event);
   }
-  void TakeEvent(const LEvent& event);
+  void TakeEvent(const Event& event);
 
   /// Returns the event status of an event 
-  EventStatusEnum EventStatus(const LEvent& event) const;
+  EventStatusEnum EventStatus(const Event& event) const;
 
 
 private:
   void TakeOldEvents();
 
-  std::set<LEvent> event_list;
-  LTime current_time;
+  std::set<Event> event_list;
+  Time current_time;
 };
 
+} // end LINA namespace
 #endif //LCALENDAR_H

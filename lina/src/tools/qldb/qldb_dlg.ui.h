@@ -16,9 +16,10 @@
 #include <vector>
 
 using namespace std;
+using namespace LINA;
 
 QDir root;
-LID* current_LID=NULL;
+ID* current_LID=NULL;
 
 void QLDB::open_database_root()
 {
@@ -30,9 +31,9 @@ void QLDB::open_database_root()
   {
 
   //Clear all database-roots
-  LDB.Clear();
+  DB.Clear();
   //Add database root
-  LDB.AddRoot(root.path().latin1());
+  DB.AddRoot(root.path().latin1());
 
   listView->clear();
   //get the catalogs in the database root and assign them to catalogs
@@ -65,7 +66,7 @@ void QLDB::open_database_root()
   int prio = tmp.toInt();
   
   spinBox_prio->setValue(prio);
-  LDB.SetWriteFlag(prio);
+  DB.SetWriteFlag(prio);
   }
   else
   {
@@ -82,7 +83,7 @@ void QLDB::open_LID( QListViewItem* item )
     table->setNumRows(0);
 
     std::set<string> keys;
-    table->setNumRows(LDB.GetKeys(LID(item->parent()->text(0).latin1(),item->text(0).latin1()),keys));
+    table->setNumRows(DB.GetKeys(ID(item->parent()->text(0).latin1(),item->text(0).latin1()),keys));
     int i=0;
     for(set<string>::iterator it = keys.begin(); it != keys.end(); ++it,++i)
     {
@@ -91,7 +92,7 @@ void QLDB::open_LID( QListViewItem* item )
 
       //read the key's value array and assign it to value_vector
       vector<string> value_vector;
-      LDB.ReadArray(LID(item->parent()->text(0).latin1(),item->text(0).latin1()),(*it),value_vector);
+      DB.ReadArray(ID(item->parent()->text(0).latin1(),item->text(0).latin1()),(*it),value_vector);
       int y=1;
       for(vector<string>::iterator s_it = value_vector.begin(); s_it != value_vector.end(); ++s_it,++y)
       {
@@ -115,7 +116,7 @@ void QLDB::open_LID( QListViewItem* item )
     label_LID->setText("LID - Catalog: "+item->parent()->text(0)+" Token: "+item->text(0));
     //update current_LID
     delete current_LID;
-    current_LID = new LID(item->parent()->text(0).latin1(),item->text(0).latin1());
+    current_LID = new ID(item->parent()->text(0).latin1(),item->text(0).latin1());
   }
 }
 
@@ -140,7 +141,7 @@ void QLDB::save_LID()
         }
 
         //write the array of the current key to the LID
-        LDB.WriteArray(*current_LID,table->text(i,0).latin1(),value_vector);
+        DB.WriteArray(*current_LID,table->text(i,0).latin1(),value_vector);
       }
     }
   }
@@ -246,11 +247,11 @@ void QLDB::import_template()
     {
     QFileInfo fi(filename);
     filename = fi.fileName();
-    LID template_LID("templates",filename.latin1());
+    ID template_LID("templates",filename.latin1());
 
     std::set<string> keys;
     int i=table->numRows();
-    table->setNumRows(table->numRows() + LDB.GetKeys(template_LID,keys));
+    table->setNumRows(table->numRows() + DB.GetKeys(template_LID,keys));
     for(set<string>::iterator it = keys.begin(); it != keys.end(); ++it,++i)
     {
       //insert the key into the table
@@ -258,7 +259,7 @@ void QLDB::import_template()
 
       //read the key's value array and assign it to value_vector
       vector<string> value_vector;
-      LDB.ReadArray(template_LID,(*it),value_vector);
+      DB.ReadArray(template_LID,(*it),value_vector);
       int y=1;
       for(vector<string>::iterator s_it = value_vector.begin(); s_it != value_vector.end(); ++s_it,++y)
       {
@@ -287,7 +288,7 @@ void QLDB::show_source()
 if(current_LID)
 {
  string source;
- LDB.ReadPlainText(*current_LID,source);
+ DB.ReadPlainText(*current_LID,source);
  QDialog source_viewer(this,"Show source");
  QTextEdit source_textedit(&source_viewer,"hmm");
  source_textedit.setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -295,7 +296,7 @@ if(current_LID)
  source_viewer.setGeometry(200,200,500,400);
  source_viewer.setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
  source_textedit.setGeometry(0,0,500,400);
- source_textedit.setText(source);
+ source_textedit.setText(source.c_str());
  source_textedit.setReadOnly(true);
  source_viewer.exec();
  }

@@ -22,6 +22,7 @@
 #include <lrand.h>
 
 using namespace std;
+using namespace LINA;
 
 struct test
 {
@@ -32,37 +33,37 @@ long longer;
 int main(int argc, char *argv[])
 {
 
-LPtr<LID> test_lid(LID("bla","blub"));
-LPtr<LID> test_ptr_lid(test_lid);
+Ptr<ID> test_lid(ID("bla","blub"));
+Ptr<ID> test_ptr_lid(test_lid);
 
-LPtr<int> int_test_test(123);
-LDebug("123",*int_test_test);
+Ptr<int> int_test_test(123);
+Debug("123",*int_test_test);
 
 int* real_pointer = new int;
 *real_pointer = 23;
-LPtr<int> int_test(real_pointer);
-LDebug("23",*int_test);
+Ptr<int> int_test(real_pointer);
+Debug("23",*int_test);
 
-LPtr<long> long_test;
-LDebug("Is NULL",long_test.IsNULL() ? "IS NULL" : "" );
+Ptr<long> long_test;
+Debug("Is NULL",long_test.IsNULL() ? "IS NULL" : "" );
 
-LPtr<char> char_test('a');
-LDebug("a",*char_test);
+Ptr<char> char_test('a');
+Debug("a",*char_test);
 
-LPtr<int> int_test2(new int);
+Ptr<int> int_test2(new int);
 *int_test2 = 400;
-LDebug("400",*int_test2);
+Debug("400",*int_test2);
 
-LPtr<test> struct_test(new test);
+Ptr<test> struct_test(new test);
 struct_test->integer = 33;
 struct_test->longer = 0;
-LDebug("33",struct_test->integer);
-LDebug("0",struct_test->longer);
+Debug("33",struct_test->integer);
+Debug("0",struct_test->longer);
 
-LPtr<float> floating_test;
+Ptr<float> floating_test;
 floating_test = new float;
 *floating_test = 99;
-LDebug(99,*floating_test);
+Debug(99,*floating_test);
 
 return 0;
 }

@@ -21,20 +21,20 @@
 #include <ldefault.h>
 
 using namespace std;
-
+using namespace LINA;
 
 int main(int argc, char *argv[])
 {
 
 int i;
 string s("123");
-LStringToDigit(i,s);
-LDebug(s,i);
+StringToDigit(i,s);
+Debug(s,i);
 
 string s2;
 float f = 99.9;
-LDigitToString(f,s2);
-LDebug(s2,f);
+DigitToString(f,s2);
+Debug(s2,f);
 
   return EXIT_SUCCESS;
 }

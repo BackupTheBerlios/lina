@@ -25,7 +25,7 @@
 #include "linachat.h"
 
 using namespace std;
-
+using namespace LINA;
 
 int main(int argc, char *argv[])
 {
@@ -53,9 +53,9 @@ int main(int argc, char *argv[])
   }
   
   cout << "Your nickname is: "<< nick << endl;
-  mylinachat->set_nick(nick);
+  mylinachat->set_nick(nick.c_str());
   if(!server.empty())
-  mylinachat->set_server(server);
+  mylinachat->set_server(server.c_str());
   
   return myapp.exec();
   
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     cin >> input;
 
     
-    LNetPackage tmp;
+    NetPackage tmp;
     
     cout << "SendITTT" << endl;
     

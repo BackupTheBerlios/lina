@@ -22,12 +22,12 @@
 #include <lserver.h>
 
 using namespace std;
-
+using namespace LINA;
 
 int main(int argc, char *argv[])
 {
 
-  LServer server;
+  Server server;
   server.Run();
 
   return EXIT_SUCCESS;

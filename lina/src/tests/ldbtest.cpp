@@ -32,75 +32,75 @@
 #include <lmetrics.h>
 
 using namespace std;
-
+using namespace LINA;
 
 int main(int argc, char *argv[])
 {
 
-LID* bla = new LID("bla","foo");
+ID* bla = new ID("bla","foo");
 
 
-cout<<"Test LDBPair:"<<endl;
-    LDBPairSet ldbpairset;
-    ldbpairset.insert(LDBPair("A",0));
-    ldbpairset.insert(LDBPair("B",2));
-    ldbpairset.insert(LDBPair("C",1));
-    ldbpairset.insert(LDBPair("D",2));
+cout<<"Test DBPair:"<<endl;
+    DBPairSet ldbpairset;
+    ldbpairset.insert(DBPair("A",0));
+    ldbpairset.insert(DBPair("B",2));
+    ldbpairset.insert(DBPair("C",1));
+    ldbpairset.insert(DBPair("D",2));
 
-LDebug("B\nC\nA","");
-    for(LDBPairSet::iterator it = ldbpairset.begin(); it != ldbpairset.end(); ++it)
+Debug("B\nC\nA","");
+    for(DBPairSet::iterator it = ldbpairset.begin(); it != ldbpairset.end(); ++it)
    {
    cout<<(*it).first<<endl;
    }
 
 
 
-LDB.AddRoot("../../data/database/test/root1");
-LDB.AddRoot("../../data/database/test/root2");
-LDB.AddRoot("../../data/database/test/root3");
+DB.AddRoot("../../data/database/test/root1");
+DB.AddRoot("../../data/database/test/root2");
+DB.AddRoot("../../data/database/test/root3");
 
 cout<<"\nTest database creation:"<<endl;
-if(LDB.CreateRoot("/var/tmp/testdatabase"))
+if(DB.CreateRoot("/var/tmp/testdatabase"))
 cout<<"PASSED!"<<endl;
 else
 cout<<"FAILED!"<<endl;
 
-LID lidtest("player","ANDRZIEG");
+ID lidtest("player","ANDRZIEG");
 
 cout<<"Test database iteration:"<<endl;
-set<LID> testvec;
-LDB.IterateLIDs(lidtest.Catalog(),testvec);
-for(set<LID>::iterator it = testvec.begin(); it != testvec.end(); ++it)
+set<ID> testvec;
+DB.IterateIDs(lidtest.Catalog(),testvec);
+for(set<ID>::iterator it = testvec.begin(); it != testvec.end(); ++it)
 {
 cout<<(*it).Token()<<endl;
 }
 
-cout<<"Test LID finding:"<<endl;
+cout<<"Test ID finding:"<<endl;
 testvec.clear();
-LDB.FindLIDs(lidtest.Catalog(),"testdata","hallo wie gehts",testvec);
-for(set<LID>::iterator it = testvec.begin(); it != testvec.end(); ++it)
+DB.FindIDs(lidtest.Catalog(),"testdata","hallo wie gehts",testvec);
+for(set<ID>::iterator it = testvec.begin(); it != testvec.end(); ++it)
 {
 cout<<(*it).Token()<<endl;
 }
 
-string res = LDB.Read(LID("player","ANDRZIEG"),"mehrtestdata");
+string res = DB.Read(ID("player","ANDRZIEG"),"mehrtestdata");
   cout <<"\n"<< res << "MTD" << endl;
-res = LDB.Read(LID("player","ANDRZIEG"),"testdata");
+res = DB.Read(ID("player","ANDRZIEG"),"testdata");
   cout <<"\n"<< res << endl;
 
 
-LDB.Erase(LID("player","ANDRZIEG"),"testdata");
-LDB.Write(LID("player","ANDRZIEG"),"testdata","crazy\\\ntest");
+DB.Erase(ID("player","ANDRZIEG"),"testdata");
+DB.Write(ID("player","ANDRZIEG"),"testdata","crazy\\\ntest");
 
 
-LDatabase::LIDInfo info = LDB.GetLIDInfo(LID("player","ANDRZIEG"));
+Database::IDInfo info = DB.GetIDInfo(ID("player","ANDRZIEG"));
 
-  for(LDBPairSet::iterator it = info.root_prio_set.begin(); it != info.root_prio_set.end(); ++it)
+  for(DBPairSet::iterator it = info.root_prio_set.begin(); it != info.root_prio_set.end(); ++it)
   {
       cout<<"Root: "<<(*it).first<<endl<<"With prio: "<<(*it).second<<endl;
   }
 
-LDBPairSet::iterator it = info.root_prio_set.find(LDBPair("",1));
+DBPairSet::iterator it = info.root_prio_set.find(DBPair("",1));
 if(it != info.root_prio_set.end())
 {
 cout<<"Mid: "<<(*it).first;
@@ -110,21 +110,21 @@ vector<int> int_v;
 int_v.push_back(123);
 int_v.push_back(321);
 int_v.push_back(456);
-LDB.WriteArray(LID("player","extrem"),"cool",int_v);
+DB.WriteArray(ID("player","extrem"),"cool",int_v);
 
-int sizes = LDB.ReadArraySize(LID("player","extrem"),"cool");
-LDebug("3",sizes);
+int sizes = DB.ReadArraySize(ID("player","extrem"),"cool");
+Debug("3",sizes);
 
 int woa = 1232;
-LDB.Write(LID("player","extrem"),"uncool",woa);
+DB.Write(ID("player","extrem"),"uncool",woa);
 
 int int_vr;
-LDB.Read(LID("player","extrem"),"uncool",int_vr);
-LDebug(woa,int_vr);
+DB.Read(ID("player","extrem"),"uncool",int_vr);
+Debug(woa,int_vr);
 
 
 vector<float> isset;
-LDB.ReadArray<float>(LID("player","extrem"),"cool",isset);
+DB.ReadArray<float>(ID("player","extrem"),"cool",isset);
 
    for(vector<float>::iterator it = isset.begin(); it != isset.end(); ++it)
    {
@@ -132,11 +132,11 @@ LDB.ReadArray<float>(LID("player","extrem"),"cool",isset);
    }
    
    
-LPoint anti_plan;
-LDB.Read(LID("player","extrem"),"fly",anti_plan);
-LDebug(anti_plan);
-LPoint advanced(4, 1. / 2. );
-LDB.Write(LID("player","extrem"),"fly",advanced);
+Point anti_plan;
+DB.Read(ID("player","extrem"),"fly",anti_plan);
+Debug(anti_plan);
+Point advanced(4, 1. / 2. );
+DB.Write(ID("player","extrem"),"fly",advanced);
    
  /*while (!isset.empty() )
  {
@@ -147,7 +147,7 @@ LDB.Write(LID("player","extrem"),"fly",advanced);
    
 float suppa[3];
 
-/*LDB.ReadArray<float>(LID("player","extrem"),"cool",suppa);
+/*DB.ReadArray<float>(ID("player","extrem"),"cool",suppa);
 
    cout<<suppa[0]<<endl;
    cout<<suppa[1]<<endl;

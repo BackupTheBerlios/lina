@@ -23,47 +23,51 @@
 
 #include <ldatabase.h>
 
+namespace LINA {
+
 /// Base class for competitions
-class LCompetition : public LDatabaseInterface
+class Competition : public DatabaseInterface
 {
 public:
-  LCompetition(const LID& lid) : LDatabaseInterface(lid) {}
+  Competition(const ID& lid) : DatabaseInterface(lid) {}
   virtual void Save() const {};
   unsigned int Participants() const
   {
     return participants.size();
   };
-  virtual void AddParticipant(const LID& lid)
+  virtual void AddParticipant(const ID& lid)
   {
     participants.insert(lid);
   };
 
 private:
   std::set
-    <LID> participants;
+    <ID> participants;
 };
 
-class LCompetitionManager : public LDatabaseInterface
+class CompetitionManager : public DatabaseInterface
 {
 public:
-  LCompetitionManager(const LID& lid) : LDatabaseInterface(lid) {}
+  CompetitionManager(const ID& lid) : DatabaseInterface(lid) {}
 
 private:
   std::set
-    <LID> competitions;
+    <ID> competitions;
 };
 
-class LLeague : public LCompetition
+class League : public Competition
 {
 public:
-  LLeague(const LID& lid) : LCompetition(lid) {};
+  League(const ID& lid) : Competition(lid) {};
 };
 
-class LCup : public LCompetition
+class Cup : public Competition
 {
 public:
-  LCup(const LID& lid) : LCompetition(lid) {};
+  Cup(const ID& lid) : Competition(lid) {};
 };
+
+} // end LINA namespace
 
 #endif //LCOMPETITION_H
 

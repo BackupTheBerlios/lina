@@ -24,29 +24,30 @@
 #include <ldefault.h>
 
 using namespace std;
+using namespace LINA;
 
 int main(int argc, char *argv[])
 {
 
-  LID eins("eins","one");
-  LID eeeins("zwei","two");
+  ID eins("eins","one");
+  ID eeeins("zwei","two");
   stringstream ss;
   ss << eins;
   ss >> eeeins;
-  LDebug(eeeins.Catalog());
-  LDebug(eeeins);
+  Debug(eeeins.Catalog());
+  Debug(eeeins);
 
-  LTime a(2000,12,1,0,40,33);
-  LTime w(2000,12,1,0,30,33);   
-  LTime b(2000,12,2);
-  LTime c(2000,12,3);
-  LTime d(2000,12,4);
-  LTime k(2000,12,4,11,34,11);  
-  LTime z(2000,12,4,12,44,22);  
-  LTime e(2000,12,5);
-  LTime f(2000,12,6);
+  Time a(2000,12,1,0,40,33);
+  Time w(2000,12,1,0,30,33);   
+  Time b(2000,12,2);
+  Time c(2000,12,3);
+  Time d(2000,12,4);
+  Time k(2000,12,4,11,34,11);  
+  Time z(2000,12,4,12,44,22);  
+  Time e(2000,12,5);
+  Time f(2000,12,6);
   
-  set<LTime> h;
+  set<Time> h;
   h.insert(k);  
   h.insert(z);
   h.insert(w);  
@@ -57,40 +58,40 @@ int main(int argc, char *argv[])
   h.insert(a);
   h.insert(f);
   
-  for(std::set<LTime>::iterator it = h.begin(); it != h.end(); ++it)
+  for(std::set<Time>::iterator it = h.begin(); it != h.end(); ++it)
   {
-  LDebug((*it));
+  Debug((*it));
   }
         
-  LTime test_time(2000,12,30);
+  Time test_time(2000,12,30);
   int mon;
   //cin>>mon;
-  mon = LRand().RandInt(1000);
+  mon = Random().RandInt(1000);
   test_time.AddMonths(mon);
-  LDebug(test_time.Year());
-  LDebug(test_time.Month());
-  LDebug(test_time.Day());
+  Debug(test_time.Year());
+  Debug(test_time.Month());
+  Debug(test_time.Day());
   if(test_time.LeapYear(test_time.Year()))
   {
-    LDebug("true");
+    Debug("true");
   }
  
-  LStadium sta(LID("stadium","FCB"));
-  LEvent tz(LTime(2003,12,8),LTime(2003,12,15),LEventID(LID("foo","bar"),3));
+  Stadium sta(ID("stadium","FCB"));
+  Event tz(Time(2003,12,8),Time(2003,12,15),LEventID(ID("foo","bar"),3));
   
   sta.HandleEvent(tz);
 
     
-  LDebug(tz);
+  Debug(tz);
   
-  LDB.AddRoot("../../data/database/test/root1");
-  LDB.SetWriteFlag(1);
+  DB.AddRoot("../../data/database/test/root1");
+  DB.SetWriteFlag(1);
   
- LCalendar cal(LID("special","aid"),LTime(2003,12,10));
+ Calendar cal(ID("special","aid"),Time(2003,12,10));
       
   cal.InsertEvent(tz);
     
-  LEvent* leventptr;
+  Event* leventptr;
   leventptr = cal.NextEvent();
   
   if(leventptr->EventLID().Catalog() == "foo")
@@ -98,7 +99,7 @@ int main(int argc, char *argv[])
   sta.HandleEvent(*leventptr);
   }
   
-  LDebug(*leventptr);
+  Debug(*leventptr);
   
   
   

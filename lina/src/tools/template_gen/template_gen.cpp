@@ -23,9 +23,9 @@
 int main(int argc, char *argv[])
 {
 
-LDB.AddRoot("../../data/database/test/root1");
+LINA::DB.AddRoot("../../data/database/test/root1");
 
-LFootballStadium fbstadium(LID("templates","stadium"));
+LINA::FootballStadium fbstadium(LINA::ID("templates","stadium"));
 fbstadium.Save();
 
   return EXIT_SUCCESS;

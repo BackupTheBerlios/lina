@@ -21,118 +21,118 @@
 #include <math.h>
 #include <lmetrics.h>
 
-std::ostream& operator<<(std::ostream& os, const LPoint& rv)
+std::ostream& LINA::operator<<(std::ostream& os, const LINA::Point& rv)
 {
 return os << rv.x << " " << rv.y;
 }
 
-std::istream& operator>>(std::istream& is, LPoint& rv)
+std::istream& LINA::operator>>(std::istream& is, LINA::Point& rv)
 {
 return is >> rv.x >> rv.y;
 }
 
-LPoint operator+(const LPoint &rv1, const LPoint &rv2)
+LINA::Point LINA::operator+(const LINA::Point &rv1, const LINA::Point &rv2)
 {
-    return LPoint(rv1.x + rv2.x, rv1.y + rv2.y);
+    return LINA::Point(rv1.x + rv2.x, rv1.y + rv2.y);
 }
 
-LPoint operator-(const LPoint &rv1, const LPoint &rv2)
+LINA::Point LINA::operator-(const LINA::Point &rv1, const LINA::Point &rv2)
 {
-    return LPoint(rv1.x - rv2.x, rv1.y - rv2.y);
+    return LINA::Point(rv1.x - rv2.x, rv1.y - rv2.y);
 }
 
-LPoint& LPoint::operator*(float s)
+LINA::Point& LINA::Point::operator*(float s)
 {
     x *= s;
     y *= s;
     return *this;
 }
 
-LPoint& LPoint::operator/(float s)
+LINA::Point& LINA::Point::operator/(float s)
 {
     x /= s;
     y /= s;
     return *this;
 }
 
-LPoint Middle(const LPoint &rv1, const LPoint &rv2)
+LINA::Point LINA::Middle(const LINA::Point &rv1, const LINA::Point &rv2)
 {
 
-    return LPoint((rv1.x + rv2.x) / 2, (rv1.y + rv2.y) / 2);
+    return LINA::Point((rv1.x + rv2.x) / 2, (rv1.y + rv2.y) / 2);
 }
 
-float Distance(const LPoint &rv1, const LPoint &rv2)
+float LINA::Distance(const LINA::Point &rv1, const LINA::Point &rv2)
 {
 
     return sqrt((rv1.x - rv2.x)*(rv1.x - rv2.x) + (rv1.y - rv2.y)*(rv1.y - rv2.y));
 }
 
-bool LPoint::IsNear(const LPoint& n,float d)
+bool LINA::Point::IsNear(const LINA::Point& n,float d)
 {
 return (n.x-x)*(n.x-x)+(n.y-y)*(n.y-y) <= d*d;
 }
 
-LPoint& LPoint::operator=(const LPoint &rv)
+LINA::Point& LINA::Point::operator=(const LINA::Point &rv)
 {
     x = rv.x;
     y = rv.y;
     return *this;
 }
 
-LPoint& LPoint::operator+= (const LPoint &rv)
+LINA::Point& LINA::Point::operator+= (const LINA::Point &rv)
 {
     x += rv.x;
     y += rv.y;
     return *this;
 }
 
-LPoint& LPoint::operator-= (const LPoint &rv)
+LINA::Point& LINA::Point::operator-= (const LINA::Point &rv)
 {
     x -= rv.x;
     y -= rv.y;
     return *this;
 }
 
-LPoint& LPoint::operator*= (float s)
+LINA::Point& LINA::Point::operator*= (float s)
 {
     x *= s;
     y *= s;
     return *this;
 }
 
-LPoint& LPoint::operator/= (float s)
+LINA::Point& LINA::Point::operator/= (float s)
 {
     x /= s;
     y /= s;
     return *this;
 }
 
-bool LPoint::operator> (const LPoint &rv)
+bool LINA::Point::operator> (const LINA::Point &rv)
 {
     return x > rv.x && y > rv.y;
 }
 
-bool LPoint::operator< (const LPoint &rv)
+bool LINA::Point::operator< (const LINA::Point &rv)
 {
     return x < rv.x && y < rv.y;
 }
 
-bool LPoint::operator== (const LPoint &rv)
+bool LINA::Point::operator== (const LINA::Point &rv)
 {
     return x == rv.x && y == rv.y;
 }
 
-bool LPoint::operator!= (const LPoint &rv)
+bool LINA::Point::operator!= (const LINA::Point &rv)
 {
     return x != rv.x || y != rv.y;
 }
 
-bool LPoint::operator<= (const LPoint &rv)
+bool LINA::Point::operator<= (const LINA::Point &rv)
 {
     return x <= rv.x && y <= rv.y;
 }
 
-bool LPoint::operator>= (const LPoint &rv)
+bool LINA::Point::operator>= (const LINA::Point &rv)
 {
     return x >= rv.x && y >= rv.y;
 }

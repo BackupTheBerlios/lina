@@ -23,13 +23,17 @@
 
 #include <ldatabase.h>
 
-class LStats : public LDatabaseInterface
+namespace LINA {
+
+class Stats : public DatabaseInterface
 {
 public:
-LStats(const LID& lid) : LDatabaseInterface(lid) {};
+Stats(const ID& lid) : DatabaseInterface(lid) {};
 
 
 };
+
+} // end LINA namespace
 
 #endif //LSTATS_H
 

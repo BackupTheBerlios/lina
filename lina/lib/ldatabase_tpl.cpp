@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-template<class T> inline void LDatabase::Write(const LID& lid, const std::string& key, const T& value) const
+template<class T> inline void Database::Write(const ID& lid, const std::string& key, const T& value) const
 {
   std::stringstream ss;
   ss<<value;
@@ -26,7 +26,7 @@ template<class T> inline void LDatabase::Write(const LID& lid, const std::string
 }
 
 template<class IT>
-void LDatabase::WriteArray(const LID& lid, const std::string& key, IT begin, const IT end) const
+void Database::WriteArray(const ID& lid, const std::string& key, IT begin, const IT end) const
 {
   std::stringstream value;
   if(begin!=end)
@@ -42,18 +42,18 @@ void LDatabase::WriteArray(const LID& lid, const std::string& key, IT begin, con
   Write(lid,key,value);
 }
 
-template<class T> inline void LDatabase::Read(const LID& lid, const std::string& key, T& value) const
+template<class T> inline void Database::Read(const ID& lid, const std::string& key, T& value) const
 {
   std::stringstream ss;
   Read(lid,key,ss);
   ss>>value;
 }
 
-template<class T,class Cont> void LDatabase::ReadArray(const LID& lid, const std::string& key, Cont& cont) const
+template<class T,class Cont> void Database::ReadArray(const ID& lid, const std::string& key, Cont& cont) const
 {
   //get the plain value
   std::string value = Read(lid,key);
-  LDebug(value);
+  Debug(value);
 
   std::insert_iterator<Cont> it(cont,cont.end());
   int lastpos=0;
@@ -80,102 +80,102 @@ template<class T,class Cont> void LDatabase::ReadArray(const LID& lid, const std
 }
 
 template<class T>
-void LDatabaseInterface::LazyGet(const std::string& key, std::string& ref)
+void DatabaseInterface::LazyGet(const std::string& key, std::string& ref)
 {
   if(lazy_members.find(&ref) == lazy_members.end())
   {
-    LDB.Read(my_LID,my_section+key,ref);
+    DB.Read(my_LID,my_section+key,ref);
 
     lazy_members.insert(&ref);
   }
 }
 
 template<class T>
-void LDatabaseInterface::LazyGet(const std::string& key, std::string*& ref)
-{
-  if(lazy_members.find(&ref) == lazy_members.end())
-  {
-    delete ref;
-    ref = new T;
-    LDB.Read(my_LID,my_section+key,*ref);
-    lazy_members.insert(&ref);
-  }
-}
-
-template<class T>
-void LDatabaseInterface::LazyGet(const std::string& key, T& ref)
-{
-  if(lazy_members.find(&ref) == lazy_members.end())
-  {
-    LDB.Read(my_LID,my_section+key,ref);
-
-    lazy_members.insert(&ref);
-  }
-}
-
-template<class T>
-void LDatabaseInterface::LazyGet(const std::string& key, T*& ref)
+void DatabaseInterface::LazyGet(const std::string& key, std::string*& ref)
 {
   if(lazy_members.find(&ref) == lazy_members.end())
   {
     delete ref;
     ref = new T;
-    LDB.Read(my_LID,my_section+key,*ref);
+    DB.Read(my_LID,my_section+key,*ref);
     lazy_members.insert(&ref);
   }
 }
 
 template<class T>
-void LDatabaseInterface::LazySave(const std::string& key, const T& ref) const
+void DatabaseInterface::LazyGet(const std::string& key, T& ref)
 {
-  if(lazy_members.find(const_cast<T*>(&ref)) != lazy_members.end())
+  if(lazy_members.find(&ref) == lazy_members.end())
   {
-    LDB.Write(my_LID, my_section+key, ref);
+    DB.Read(my_LID,my_section+key,ref);
+
+    lazy_members.insert(&ref);
   }
 }
 
 template<class T>
-void LDatabaseInterface::LazySave(const std::string& key, const T*& ref) const
+void DatabaseInterface::LazyGet(const std::string& key, T*& ref)
 {
-  if(lazy_members.find(const_cast<T*>(&ref)) != lazy_members.end())
+  if(lazy_members.find(&ref) == lazy_members.end())
   {
-    LDB.Write(my_LID, my_section+key, *ref);
+    delete ref;
+    ref = new T;
+    DB.Read(my_LID,my_section+key,*ref);
+    lazy_members.insert(&ref);
   }
 }
 
 template<class T>
-void LDatabaseInterface::LazySave(const std::string& key, const std::string& ref) const
+void DatabaseInterface::LazySave(const std::string& key, const T& ref) const
 {
   if(lazy_members.find(const_cast<T*>(&ref)) != lazy_members.end())
   {
-    LDB.Write(my_LID, my_section+key, ref);
+    DB.Write(my_LID, my_section+key, ref);
   }
 }
 
 template<class T>
-void LDatabaseInterface::LazySave(const std::string& key, const std::string*& ref) const
+void DatabaseInterface::LazySave(const std::string& key, const T*& ref) const
 {
   if(lazy_members.find(const_cast<T*>(&ref)) != lazy_members.end())
   {
-    LDB.Write(my_LID, my_section+key, *ref);
+    DB.Write(my_LID, my_section+key, *ref);
+  }
+}
+
+template<class T>
+void DatabaseInterface::LazySave(const std::string& key, const std::string& ref) const
+{
+  if(lazy_members.find(const_cast<T*>(&ref)) != lazy_members.end())
+  {
+    DB.Write(my_LID, my_section+key, ref);
+  }
+}
+
+template<class T>
+void DatabaseInterface::LazySave(const std::string& key, const std::string*& ref) const
+{
+  if(lazy_members.find(const_cast<T*>(&ref)) != lazy_members.end())
+  {
+    DB.Write(my_LID, my_section+key, *ref);
   }
 }
 
 template<class IT>
-void LDatabaseInterface::LazySaveArray(const std::string& key,const void* ref, IT begin, IT end) const
+void DatabaseInterface::LazySaveArray(const std::string& key,const void* ref, IT begin, IT end) const
 {
   if(lazy_members.find(ref) != lazy_members.end())
   {
-    LDB.WriteArray(my_LID, my_section+key, begin, end);
+    DB.WriteArray(my_LID, my_section+key, begin, end);
   }
 }
 
 template<class Cont>
-void LDatabaseInterface::LazySaveArray(const std::string& key, const Cont& ref) const
+void DatabaseInterface::LazySaveArray(const std::string& key, const Cont& ref) const
 {
   if(lazy_members.find(const_cast<Cont*>(&ref)) != lazy_members.end())
   {
-    LDB.WriteArray(my_LID, my_section+key, ref.begin(), ref.end());
+    DB.WriteArray(my_LID, my_section+key, ref.begin(), ref.end());
   }
 }
 

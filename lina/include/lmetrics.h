@@ -23,32 +23,34 @@
 
 #include <iostream>
 
-/// LPoint represents a 2d coordinate.
-/** LPoint can be used to represent and
+namespace LINA {
+
+/// Point represents a 2d coordinate.
+/** Point can be used to represent and
     manipulate a coordinate.*/
-class LPoint
+class Point
 {
 /// Operators << and >>.
 /** Makes `cout' and `cin' operations
-    possible with LRange. */
-friend std::ostream &operator<<(std::ostream&, const LPoint&);
-friend std::istream &operator>>(std::istream& is, LPoint&);
+    possible with Range. */
+friend std::ostream &operator<<(std::ostream&, const Point&);
+friend std::istream &operator>>(std::istream& is, Point&);
 
 /// Operators for standard calculations.
-friend LPoint operator+(const LPoint&, const LPoint&);
-friend LPoint operator-(const LPoint&, const LPoint&);
+friend Point operator+(const Point&, const Point&);
+friend Point operator-(const Point&, const Point&);
 
 /// Returns the coordinate of the middle between two coordinates.
-friend LPoint Middle(const LPoint&, const LPoint&);
+friend Point Middle(const Point&, const Point&);
 /// Returns the distance between two coordinates.
-friend float Distance(const LPoint&, const LPoint&);
+friend float Distance(const Point&, const Point&);
 
 public:
-LPoint() : x(0),y(0) {};
+Point() : x(0),y(0) {};
 /// Constructor.
-LPoint(float coord_x, float coord_y) : x(coord_x),y(coord_y) {};
+Point(float coord_x, float coord_y) : x(coord_x),y(coord_y) {};
 /// Copy-constructor.
-LPoint(const LPoint& rhs) : x(rhs.x), y(rhs.y) {};
+Point(const Point& rhs) : x(rhs.x), y(rhs.y) {};
 /// Set the X coordinate.
 void SetX(float coord_x) { x = coord_x; };
 /// Set the Y coordinate.
@@ -58,31 +60,33 @@ float X() { return x; };
 /// Get the Y coordinate.
 float Y() { return y; };
 /// Is it near to a certain coordinate?
-bool IsNear(const LPoint& n,float d);
+bool IsNear(const Point& n,float d);
 
 // Assignment operators.
-LPoint &operator= (const LPoint&);
-LPoint &operator+= (const LPoint&);
-LPoint &operator-= (const LPoint&);
-LPoint &operator*= (float s);
-LPoint &operator/= (float s);
+Point &operator= (const Point&);
+Point &operator+= (const Point&);
+Point &operator-= (const Point&);
+Point &operator*= (float s);
+Point &operator/= (float s);
 
 // Calculation operators.
-LPoint &operator*(float s);
-LPoint &operator/(float s);
+Point &operator*(float s);
+Point &operator/(float s);
 
 // Boolean operators.
-bool operator< (const LPoint&);
-bool operator> (const LPoint&);
-bool operator== (const LPoint&);
-bool operator!= (const LPoint&);
-bool operator<= (const LPoint&);
-bool operator>= (const LPoint&);
+bool operator< (const Point&);
+bool operator> (const Point&);
+bool operator== (const Point&);
+bool operator!= (const Point&);
+bool operator<= (const Point&);
+bool operator>= (const Point&);
 
 private:
 //coordinates
 float x;
 float y;
 };
+
+} // end LINA namespace
 
 #endif //LMETRICS_H

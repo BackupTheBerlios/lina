@@ -23,23 +23,25 @@
 
 #include <iostream>
 
+namespace LINA {
+
 /// LINA Range
 /** This class provides a type of your choice
-    with the possibility to define its range. */
+    with thoe possibility to define its range. */
 template <class T=char,int min=0,int max=100>
-class LRange
+class Range
 {
     /// Operators << and >>.
     /** Makes `cout' and `cin' operations
-        possible with LRange. */
-    friend std::ostream &operator<<<T,min,max>(std::ostream&, const LRange<T,min,max>&);
-    friend std::istream &operator>><T,min,max>(std::istream& is, LRange&);
+        possible with Range. */
+    friend std::ostream &operator<<<T,min,max>(std::ostream&, const Range<T,min,max>&);
+    friend std::istream &operator>><T,min,max>(std::istream& is, Range&);
 
     // Operators for standard calculation.
-    friend LRange operator+<T,min,max>(const LRange&, const LRange&);
-    friend LRange operator-<T,min,max>(const LRange&, const LRange&);
-    friend LRange operator*<T,min,max>(const LRange&, const LRange&);
-    friend LRange operator/<T,min,max>(const LRange&, const LRange&);
+    friend Range operator+<T,min,max>(const Range&, const Range&);
+    friend Range operator-<T,min,max>(const Range&, const Range&);
+    friend Range operator*<T,min,max>(const Range&, const Range&);
+    friend Range operator/<T,min,max>(const Range&, const Range&);
 
     private:
       // The value itself - isn't it sweet?
@@ -47,29 +49,29 @@ class LRange
 
     public:
       /// Default constructor.
-      LRange();
+      Range();
       /// Constructor which takes a long int.
-      LRange(long);
-      /// Constructor which takes an LRange.
-      LRange(const LRange &rv): value(rv.value) {};
+      Range(long);
+      /// Constructor which takes an Range.
+      Range(const Range &rv): value(rv.value) {};
 
       /// Destructor.
-      ~LRange();
+      ~Range();
 
       // Assignment operators.
-      LRange &operator= (const LRange&);
-      LRange &operator+= (const LRange&);
-      LRange &operator-= (const LRange&);
-      LRange &operator*= (const LRange&);
-      LRange &operator/= (const LRange&);
+      Range &operator= (const Range&);
+      Range &operator+= (const Range&);
+      Range &operator-= (const Range&);
+      Range &operator*= (const Range&);
+      Range &operator/= (const Range&);
 
       // Boolean operators.
-      bool operator< (const LRange&);
-      bool operator> (const LRange&);
-      bool operator== (const LRange&);
-      bool operator!= (const LRange&);
-      bool operator<= (const LRange&);
-      bool operator>= (const LRange&);
+      bool operator< (const Range&);
+      bool operator> (const Range&);
+      bool operator== (const Range&);
+      bool operator!= (const Range&);
+      bool operator<= (const Range&);
+      bool operator>= (const Range&);
 
       /// Returns an integer value.
       /** Possibility to return an integer
@@ -77,9 +79,11 @@ class LRange
       operator T() { return value; }
 };
 
-typedef LRange<char> LRangeC;
+typedef Range<char> RangeC;
 
 #include "../lib/lrange.cpp"
+
+} // end namespace LINA
 
 #endif //LRANGE_H
 

@@ -23,12 +23,15 @@
  
 #include <map>
 #include <lnetwork.h>
+#include <lclient.h>
 
-class LServer : public LNetwork
+namespace LINA {
+
+class Server : public Network
 {
 public:
- LServer();
- ~LServer();
+ Server();
+ ~Server();
  void Run();
  
 private:
@@ -38,6 +41,8 @@ Netxx::StreamServer* stream_server;
 Netxx::Timeout timeout;
 std::map<Netxx::Peer,Netxx::Stream*> clients;
 };
+
+} // end LINA namespace
 
 #endif //LSERVER_H
 

@@ -24,9 +24,11 @@
 #include <string>
 #include <sstream>
 
+namespace LINA {
+
 ///Converts a string into a digit(int ...).
 template<class T>
-inline bool LStringToDigit(T &t,
+inline bool StringToDigit(T &t,
                            const std::string &s)
 {
   std::istringstream iss(s);
@@ -35,10 +37,12 @@ inline bool LStringToDigit(T &t,
 
 ///Converts a digit(int...) into a string.
 template<class T>
-inline bool LDigitToString(const T &t, std::string &s)
+inline bool DigitToString(const T &t, std::string &s)
 {
   std::stringstream tmp; tmp << t;
   s = tmp.str();
 }
+
+} // end LINA namespace
 
 #endif //LCONVERT_H

@@ -21,12 +21,12 @@
 
 #include <lrange.h>
 
-template<class T,int min,int max> LRange<T,min,max>::LRange()
+template<class T,int min,int max> LINA::Range<T,min,max>::Range()
 {
     value=min;
 }
 
-template<class T,int min,int max> LRange<T,min,max>::LRange(long x)
+template<class T,int min,int max> LINA::Range<T,min,max>::Range(long x)
 {
     if (x > max)
         x=max;
@@ -35,15 +35,15 @@ template<class T,int min,int max> LRange<T,min,max>::LRange(long x)
     value=x;
 }
 
-template<class T,int min,int max> LRange<T,min,max>::~LRange() {}
+template<class T,int min,int max> LINA::Range<T,min,max>::~Range() {}
 
-template<class T,int min,int max> LRange<T,min,max>& LRange<T,min,max>::operator=(const LRange<T,min,max> &rv)
+template<class T,int min,int max> LINA::Range<T,min,max>& LINA::Range<T,min,max>::operator=(const LINA::Range<T,min,max> &rv)
 {
     value = rv.value;
     return *this;
 }
 
-template<class T,int min,int max> LRange<T,min,max>& LRange<T,min,max>::operator+= (const LRange<T,min,max> &rv)
+template<class T,int min,int max> LINA::Range<T,min,max>& LINA::Range<T,min,max>::operator+= (const LINA::Range<T,min,max> &rv)
 {
     if ((value + rv.value) > max)
         value = max;
@@ -54,7 +54,7 @@ template<class T,int min,int max> LRange<T,min,max>& LRange<T,min,max>::operator
     return *this;
 }
 
-template<class T,int min,int max> LRange<T,min,max>& LRange<T,min,max>::operator-= (const LRange<T,min,max> &rv)
+template<class T,int min,int max> LINA::Range<T,min,max>& LINA::Range<T,min,max>::operator-= (const LINA::Range<T,min,max> &rv)
 {
     if ((value - rv.value) > max)
         value = max;
@@ -65,7 +65,7 @@ template<class T,int min,int max> LRange<T,min,max>& LRange<T,min,max>::operator
     return *this;
 }
 
-template<class T,int min,int max> LRange<T,min,max>& LRange<T,min,max>::operator*= (const LRange<T,min,max> &rv)
+template<class T,int min,int max> LINA::Range<T,min,max>& LINA::Range<T,min,max>::operator*= (const LINA::Range<T,min,max> &rv)
 {
     if ((value * rv.value) > max)
         value = max;
@@ -76,7 +76,7 @@ template<class T,int min,int max> LRange<T,min,max>& LRange<T,min,max>::operator
     return *this;
 }
 
-template<class T,int min,int max> LRange<T,min,max>& LRange<T,min,max>::operator/= (const LRange<T,min,max> &rv)
+template<class T,int min,int max> LINA::Range<T,min,max>& LINA::Range<T,min,max>::operator/= (const LINA::Range<T,min,max> &rv)
 {
     if ((value / rv.value) > max)
         value = max;
@@ -87,64 +87,64 @@ template<class T,int min,int max> LRange<T,min,max>& LRange<T,min,max>::operator
     return *this;
 }
 
-template<class T,int min,int max> bool LRange<T,min,max>::operator> (const LRange<T,min,max> &rv)
+template<class T,int min,int max> bool LINA::Range<T,min,max>::operator> (const LINA::Range<T,min,max> &rv)
 {
     return value > rv.value;
 }
 
-template<class T,int min,int max> bool LRange<T,min,max>::operator< (const LRange<T,min,max> &rv)
+template<class T,int min,int max> bool LINA::Range<T,min,max>::operator< (const LINA::Range<T,min,max> &rv)
 {
     return value < rv.value;
 }
 
-template<class T,int min,int max> bool LRange<T,min,max>::operator== (const LRange<T,min,max> &rv)
+template<class T,int min,int max> bool LINA::Range<T,min,max>::operator== (const LINA::Range<T,min,max> &rv)
 {
     return value == rv.value;
 }
 
-template<class T,int min,int max> bool LRange<T,min,max>::operator!= (const LRange<T,min,max> &rv)
+template<class T,int min,int max> bool LINA::Range<T,min,max>::operator!= (const LINA::Range<T,min,max> &rv)
 {
     return value != rv.value;
 }
 
-template<class T,int min,int max> bool LRange<T,min,max>::operator<= (const LRange<T,min,max> &rv)
+template<class T,int min,int max> bool LINA::Range<T,min,max>::operator<= (const LINA::Range<T,min,max> &rv)
 {
     return value <= rv.value;
 }
 
-template<class T,int min,int max> bool LRange<T,min,max>::operator>= (const LRange<T,min,max> &rv)
+template<class T,int min,int max> bool LINA::Range<T,min,max>::operator>= (const LINA::Range<T,min,max> &rv)
 {
     return value >= rv.value;
 }
 
-template<class T,int min,int max> std::ostream& operator<<(std::ostream& ostr, const LRange<T,min,max> &rv)
+template<class T,int min,int max> std::ostream& operator<<(std::ostream& ostr, const LINA::Range<T,min,max> &rv)
 {
     ostr << static_cast<int>(rv.value);
     return ostr;
 }
 
-template<class T,int min,int max> std::istream& operator>>(std::istream& is, LRange<T,min,max>& rv)
+template<class T,int min,int max> std::istream& operator>>(std::istream& is, LINA::Range<T,min,max>& rv)
 {
   is >> rv.value;
   return is;
 }
 
-template<class T,int min,int max> LRange<T,min,max> operator+(const LRange<T,min,max> &rv1, const LRange<T,min,max> &rv2)
+template<class T,int min,int max> LINA::Range<T,min,max> operator+(const LINA::Range<T,min,max> &rv1, const LINA::Range<T,min,max> &rv2)
 {
     return rv1.value + rv2.value;
 }
 
-template<class T,int min,int max> LRange<T,min,max> operator-(const LRange<T,min,max> &rv1, const LRange<T,min,max> &rv2)
+template<class T,int min,int max> LINA::Range<T,min,max> operator-(const LINA::Range<T,min,max> &rv1, const LINA::Range<T,min,max> &rv2)
 {
     return rv1.value - rv2.value;
 }
 
-template<class T,int min,int max> LRange<T,min,max> operator*(const LRange<T,min,max> &rv1, const LRange<T,min,max> &rv2)
+template<class T,int min,int max> LINA::Range<T,min,max> operator*(const LINA::Range<T,min,max> &rv1, const LINA::Range<T,min,max> &rv2)
 {
     return rv1.value * rv2.value;
 }
 
-template<class T,int min,int max> LRange<T,min,max> operator/(const LRange<T,min,max> &rv1, const LRange<T,min,max> &rv2)
+template<class T,int min,int max> LINA::Range<T,min,max> operator/(const LINA::Range<T,min,max> &rv1, const LINA::Range<T,min,max> &rv2)
 {
     return rv1.value / rv2.value;
 }

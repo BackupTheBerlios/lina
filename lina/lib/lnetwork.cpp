@@ -21,32 +21,32 @@
 #include <iostream>
 #include <lnetwork.h>
 
-const Netxx::port_type lina_port = 1368;
+const Netxx::port_type LINA::lina_port = 1368;
 
-int LNetwork::ReceivePackage(Netxx::Stream& net_stream, LNetPackage& net_package)
+int LINA::Network::ReceivePackage(Netxx::Stream& net_stream, LINA::NetPackage& net_package)
 {
       /* The first bytes of a datapackage are expected to be one int,
          that tells us about the overall length of the package. */
 	 Netxx::SockOpt sockopt(net_stream.get_socketfd());
 	 sockopt.set_non_blocking();
-          if (!((byte_count = net_stream.read(&net_package.size, sizeof(int))) == sizeof(int)))
+          if (!((byte_count = net_stream.read(const_cast<unsigned int*>(net_package.buffer.PSize()), sizeof(int))) == sizeof(int)))
           {
 	  
 	    /* Not enough bytes received! */
             return -1;
          }
 	 
-	 if (!((byte_count = net_stream.read(&net_package.type, sizeof(LNetPT))) /*== sizeof(LNetPT)*/ != 0))
+	 if (!((byte_count = net_stream.read(&net_package.type, sizeof(LINA::NetPT))) /*== sizeof(LINA::NetPT)*/ != 0))
           {
             /* Not enough bytes received! */
             return -1;
           }
 	  	  
-	  net_package.buffer = new char[net_package.size];
+	  net_package.buffer.Allocate(net_package.buffer.Size());
 	  unsigned int bytes;
-          for( bytes = 0; /*() > -1 &&*/  bytes < net_package.size; )
+          for( bytes = 0; /*() > -1 &&*/  bytes < net_package.buffer.Size(); )
           {
-	  byte_count = net_stream.read(net_package.buffer + bytes, net_package.size-bytes);
+	  byte_count = net_stream.read(net_package.buffer.Get() + bytes, net_package.buffer.Size()-bytes);
 	  if(byte_count > 0)
 	  bytes += byte_count;
 
@@ -63,17 +63,17 @@ int LNetwork::ReceivePackage(Netxx::Stream& net_stream, LNetPackage& net_package
 	  }
 }
 
-void LNetwork::SendPackage(Netxx::Stream& net_stream, const LNetPackage& net_package)
+void LINA::Network::SendPackage(Netxx::Stream& net_stream, const LINA::NetPackage& net_package)
 {
-char* tmp = new char[sizeof(int)+sizeof(LNetPT)+net_package.size];
-std::memcpy(tmp,&net_package.size,sizeof(int));
-std::memcpy(tmp+sizeof(int),&net_package.type,sizeof(LNetPT));
-std::memcpy(tmp+sizeof(int)+sizeof(LNetPT),net_package.buffer,net_package.size);
+char* tmp = new char[sizeof(int)+sizeof(LINA::NetPT)+net_package.buffer.Size()];
+std::memcpy(tmp,net_package.buffer.PSize(),sizeof(int));
+std::memcpy(tmp+sizeof(int),&net_package.type,sizeof(LINA::NetPT));
+std::memcpy(tmp+sizeof(int)+sizeof(LINA::NetPT),net_package.buffer.GetConst(),net_package.buffer.Size());
   /*if ( (byte_count = net_stream.write(&net_package.size, sizeof(int))) != sizeof(int))
     return;
-  if ( (byte_count = net_stream.write(&net_package.type, sizeof(LNetPT))) != sizeof(LNetPT))
+  if ( (byte_count = net_stream.write(&net_package.type, sizeof(LINA::NetPT))) != sizeof(LINA::NetPT))
     return;*/
-  if ( (byte_count = net_stream.write(tmp, sizeof(int)+sizeof(LNetPT)+net_package.size)) <= 0)
+  if ( (byte_count = net_stream.write(tmp, sizeof(int)+sizeof(LINA::NetPT)+net_package.buffer.Size())) <= 0)
     return;
     
 delete tmp;

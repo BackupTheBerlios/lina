@@ -22,16 +22,16 @@
 #include <lutility.h>
 
 using namespace std;
-
+using namespace LINA;
 
 int main(int argc, char *argv[])
 {
 
-  LRange<char> test;
+  Range<char> test;
   test = 110;
-  LDebug(test,100);
+  Debug(test,100);
   test -= 120;
-  LDebug(test,0);
+  Debug(test,0);
 
   return EXIT_SUCCESS;
 }

@@ -21,14 +21,15 @@
 #include <ldefault.h>
 
 using namespace std;
+using namespace LINA;
 
 int main(int argc, char *argv[])
 {
 
-  LDB.AddRoot("../../data/database/test/root1");
+  DB.AddRoot("../../data/database/test/root1");
 
-  LFootballStadium stadium(LID("stadium","TEST"));
-  LFootballStadium same(LID("stadium","test"));
+  FootballStadium stadium(ID("stadium","TEST"));
+  FootballStadium same(ID("stadium","test"));
 
   return EXIT_SUCCESS;
 }

@@ -22,29 +22,30 @@
 #include <lmetrics.h>
 
 using namespace std;
+using namespace LINA;
 
 int main(int argc, char *argv[])
 {
 
-  LPoint test(2,0);
-  LDebug("2 0",test);
-  test += LPoint(3,5);
-  LDebug("5 5",test);
+  Point test(2,0);
+  Debug("2 0",test);
+  test += Point(3,5);
+  Debug("5 5",test);
   test *= 2;
-  LDebug("10 10",test);
+  Debug("10 10",test);
   test /= 2;
-  LDebug("5 5",test);
-  test -= LPoint(3,2);
-  LDebug("2 3",test);
-  float d = Distance(LPoint(2,9.4),test);
-  LDebug("6.4",d);
-  LPoint m = Middle(LPoint(5,5),test);
-  LDebug("3.5 4",m);
-  bool near = test.IsNear(LPoint(0,5),3);
+  Debug("5 5",test);
+  test -= Point(3,2);
+  Debug("2 3",test);
+  float d = Distance(Point(2,9.4),test);
+  Debug("6.4",d);
+  Point m = Middle(Point(5,5),test);
+  Debug("3.5 4",m);
+  bool near = test.IsNear(Point(0,5),3);
   if(near)
-  LDebug("OK");
+  Debug("OK");
   else
-  LDebug("ERR");
+  Debug("ERR");
 
   return EXIT_SUCCESS;
 }

@@ -20,28 +20,44 @@
 
 #ifndef LCLIENT_H
 #define LCLIENT_H
- 
+
 #include <iostream>
 #include <lnetwork.h>
+#include <lrand.h>
 
-class LClient : public LNetwork
+namespace LINA {
+
+class ClientInfo
 {
 public:
- LClient(std::string uri = "localhost");
- ~LClient();
- void Reconnect();
- void Disconnect();
- void ConnectTo(std::string uri = "localhost");
- int ReceivePackage(LNetPackage& net_package);
- void SendPackage(const LNetPackage& net_package);
- bool IsConnected() { return connected; };
- 
+  ClientInfo(std::string nick = "unknown") {nickname = nick; LINA::Random rand; client_id = rand.RandInt(); }
+  std::string Nickname() {return nickname; }
+  int ClientID() { return client_id; }
 private:
-Netxx::Timeout timeout;
-Netxx::Stream* stream_client;
-int internal_id;
-bool connected;
+  std::string nickname;
+  int client_id;
 };
+
+class Client : public Network
+{
+public:
+  Client(const std::string &uri = "localhost");
+  ~Client();
+  void Reconnect();
+  void Disconnect();
+  void ConnectTo(const std::string &uri = "localhost");
+  int ReceivePackage(NetPackage& net_package);
+  void SendPackage(const NetPackage& net_package);
+  bool IsConnected() { return connected; };
+
+private:
+  Netxx::Timeout timeout;
+  Netxx::Stream* stream_client;
+  ClientInfo* client_info;
+  std::vector<ClientInfo> clients;
+  bool connected;
+};
+} // end LINA namespace
 
 #endif //LCLIENT_H
 

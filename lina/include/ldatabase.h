@@ -36,34 +36,36 @@
 #include <lconvert.h>
 #include <lutility.h>
 
+namespace LINA {
+
 /// LINA ID
 /** This class stores a unique ID,
     wich can't be changed during the runtime. */
-class LID
+class ID
 {
-  friend std::ostream &operator<<(std::ostream&, const LID&);
-  friend std::istream &operator>>(std::istream& is, LID&);
+  friend std::ostream &operator<<(std::ostream&, const ID&);
+  friend std::istream &operator>>(std::istream& is, ID&);
 
-  friend bool operator<(const LID& lhs, const LID& rhs);
-  friend bool operator>(const LID& lhs, const LID& rhs);
+  friend bool operator<(const ID& lhs, const ID& rhs);
+  friend bool operator>(const ID& lhs, const ID& rhs);
   
 public:
   /// Constructor
-  LID(const std::string& lid_catalog, const std::string& lid_token);
+  ID(const std::string& lid_catalog, const std::string& lid_token);
   /// Copy constructor
-  LID(const LID& lid);  
+  ID(const ID& lid);  
   /// Destructor
-  ~LID() {  };
+  ~ID() {  };
 
-  const std::string ID() const { return catalog+token; };
+  const std::string Id() const { return catalog+token; };
   const std::string Catalog() const { return catalog; };
   const std::string Token() const { return token; };
 
 private:
   // Constructor without arguments
-  // Is declared private, because every LID has to be identified,
+  // Is declared private, because every ID has to be identified,
   // when it is declared.
-  LID();
+  ID();
 
   std::string catalog;
   std::string token;
@@ -71,104 +73,104 @@ private:
 
 
 
-/// Global operator== for LID.
-bool operator==(const LID& lhs, const LID& rhs);
+/// Global operator== for ID.
+bool operator==(const ID& lhs, const ID& rhs);
 
 /// Enum representing priorities.
-typedef int LDBPrio;
+typedef int DBPrio;
 
 /// Pair for a database root and its priority.
-struct LDBPair
+struct DBPair
 {
-  LDBPair(const std::string& p_first, const LDBPrio& p_second) : first(p_first),second(p_second) {};
+  DBPair(const std::string& p_first, const DBPrio& p_second) : first(p_first),second(p_second) {};
   std::string first;
-  LDBPrio second;
-  friend bool operator<(const LDBPair& lhs, const LDBPair& rhs);
-  friend bool operator>(const LDBPair& lhs, const LDBPair& rhs);
+  DBPrio second;
+  friend bool operator<(const DBPair& lhs, const DBPair& rhs);
+  friend bool operator>(const DBPair& lhs, const DBPair& rhs);
 };
 
-/// Set of LDBPair.
-typedef std::set<LDBPair> LDBPairSet;
+/// Set of DBPair.
+typedef std::set<DBPair> DBPairSet;
 
 /// LINA Database
 /** This object can do several actions with a database,
     like reading and writing data.*/
-class LDatabase
+class Database
 {
 public:
-  static LDatabase& Get();
+  static Database& Get();
 
-  /// Read value from LID of the database.
+  /// Read value from ID of the database.
   /** Read the key's value from the database.*/
-  const std::string Read(const LID& lid, const std::string& key) const;
+  const std::string Read(const ID& lid, const std::string& key) const;
 
-  /// Read value from LID of the database.
+  /// Read value from ID of the database.
   /** Read the key's value from the database.*/
-  void Read(const LID& lid, const std::string& key, std::string& value) const;
+  void Read(const ID& lid, const std::string& key, std::string& value) const;
 
-  /// Read value from LID of the database.
+  /// Read value from ID of the database.
   /** Read the key's value from the database.*/
-  void Read(const LID& lid, const std::string& key, std::stringstream& value) const;
+  void Read(const ID& lid, const std::string& key, std::stringstream& value) const;
 
-  /// Read value from LID of the database.
+  /// Read value from ID of the database.
   /** Read the key's value from the database.*/
-  template<class T> void Read(const LID& lid, const std::string& key, T& value) const;
+  template<class T> void Read(const ID& lid, const std::string& key, T& value) const;
 
-  /// Read array from LID of the database.
+  /// Read array from ID of the database.
   /** Read the key's array from the database.*/
-  void ReadArray(const LID& lid, const std::string& key, std::vector<std::string>& value_vector) const;
+  void ReadArray(const ID& lid, const std::string& key, std::vector<std::string>& value_vector) const;
 
-  /// Read array from LID of the database.
+  /// Read array from ID of the database.
   /** Read the key's array from the database.*/
-  template<class T,class Cont> void ReadArray(const LID& lid, const std::string& key, Cont& cont) const;
+  template<class T,class Cont> void ReadArray(const ID& lid, const std::string& key, Cont& cont) const;
 
-  /// Read size of array from LID of the database.
+  /// Read size of array from ID of the database.
   /** Read the key's array size from the database.*/
-  int ReadArraySize(const LID& lid, const std::string& key) const;
+  int ReadArraySize(const ID& lid, const std::string& key) const;
 
-  /// Read the plain text of all database-files related to this LID
+  /// Read the plain text of all database-files related to this ID
   /** This method is thought for debugging issues.*/
-  void ReadPlainText(const LID& lid, std::string& text) const;
+  void ReadPlainText(const ID& lid, std::string& text) const;
   
-  /// Erase a key from a LID.
-  /** Erases a key completly in a certain LID.*/
-  void Erase(const LID& lid, const std::string& key) const;
+  /// Erase a key from a ID.
+  /** Erases a key completly in a certain ID.*/
+  void Erase(const ID& lid, const std::string& key) const;
 
-  /// Write values to a LID of the database.
+  /// Write values to a ID of the database.
   /** Write the key and value to the database.*/
-  void Write(const LID& lid, const std::string& key, const std::string& value) const;
+  void Write(const ID& lid, const std::string& key, const std::string& value) const;
 
-  /// Write values to a LID of the database.
+  /// Write values to a ID of the database.
   /** Write the key and value to the database.*/
-  void Write(const LID& lid, const std::string& key, const std::stringstream& value) const;
+  void Write(const ID& lid, const std::string& key, const std::stringstream& value) const;
 
-  /// Write array to a LID of the database.
+  /// Write array to a ID of the database.
   /** Write the key and array to the database.*/
-  template<class T> void Write(const LID& lid, const std::string& key, const T& value) const;
+  template<class T> void Write(const ID& lid, const std::string& key, const T& value) const;
 
-  /// Write array to a LID of the database.
+  /// Write array to a ID of the database.
   /** Write the key and array to the database.*/
   template<class IT>
-  void WriteArray(const LID& lid, const std::string& key, IT begin, const IT end) const;
+  void WriteArray(const ID& lid, const std::string& key, IT begin, const IT end) const;
 
-  /// Write array to a LID of the database.
+  /// Write array to a ID of the database.
   /** Write the key and array to the database.*/
   template<class Cont>
-  void WriteArray(const LID& lid, const std::string& key, const Cont& cont) const { WriteArray(lid,key,cont.begin(),cont.end()); }
+  void WriteArray(const ID& lid, const std::string& key, const Cont& cont) const { WriteArray(lid,key,cont.begin(),cont.end()); }
 
-  /// Get all keys in a LID
+  /// Get all keys in a ID
   /** Gets all keys and pushs them into key_set.
       Returns the number of keys.*/
-  int GetKeys(const LID& lid, std::set<std::string>& key_set) const;
+  int GetKeys(const ID& lid, std::set<std::string>& key_set) const;
 
-  /// Iterates through the LIDs.
-  /** Fills a set<LID> with all LIDs in a catalog*/
-  int IterateLIDs(const std::string& lid_catalog, std::set<LID>& lid_set);
+  /// Iterates through the IDs.
+  /** Fills a set<ID> with all IDs in a catalog*/
+  int IterateIDs(const std::string& lid_catalog, std::set<ID>& lid_set);
 
-  /// Find LIDs.
-  /** Fills a set<LID> with all LIDs,
+  /// Find IDs.
+  /** Fills a set<ID> with all IDs,
       that have the right key and value.*/
-  int FindLIDs(const std::string& lid_catalog,const std::string& key,const std::string& value, std::set<LID>& lid_set);
+  int FindIDs(const std::string& lid_catalog,const std::string& key,const std::string& value, std::set<ID>& lid_set);
 
   /// Add a database root.
   /** Returns false if the database root is invalid. */
@@ -178,11 +180,11 @@ public:
   void RemoveRoot(const std::string& db_root);
   
   /// Remove a database root.
-  void RemoveRoot(LDBPrio prio);
+  void RemoveRoot(DBPrio prio);
 
   /// Create a new database root.
   /** Returns false if it failes. */
-  bool CreateRoot(const std::string& db_root, LDBPrio=0);
+  bool CreateRoot(const std::string& db_root, DBPrio=0);
 
   /// Clear the database roots
   void Clear();
@@ -190,57 +192,60 @@ public:
   /// Set write_flag
   /** The write_flag defines to which database priority
       data may be written currently.*/
-void SetWriteFlag(LDBPrio prio) { write_flag=prio; };
+void SetWriteFlag(DBPrio prio) { write_flag=prio; };
 
-  /// Information about a LID.
-  /** Contains information about a LID.*/
-  struct LIDInfo
+  /// Information about a ID.
+  /** Contains information about a ID.*/
+  struct IDInfo
   {
-    /// This LDBPairSet contains the roots and priorities,
-    /// where a LID is found in the database.
-    LDBPairSet root_prio_set;
+    /// This DBPairSet contains the roots and priorities,
+    /// where a ID is found in the database.
+    DBPairSet root_prio_set;
   };
 
-  /// Get LIDInfo
-  /** Return a LIDInfo about a certain LID.*/
-  LIDInfo GetLIDInfo(const LID& lid) const;
+  /// Get IDInfo
+  /** Return a IDInfo about a certain ID.*/
+  IDInfo GetIDInfo(const ID& lid) const;
 
 private:
   /// Default constructor.
-  LDatabase() : write_flag(2) {};
+  Database() : write_flag(2) {};
   // Clean a lid from unparseable data TODO
-  void Clean(const LID& lid) const;
+  void Clean(const ID& lid) const;
   // Test if a file exists.
   bool Fexists(const std::string& filename) const;
-  // Finds the highest DBRoot with the LID lid.
-  std::string FindTopPriorityRoot(const LID& lid) const;
+  // Finds the highest DBRoot with the ID lid.
+  std::string FindTopPriorityRoot(const ID& lid) const;
 
   // Contains the database roots.
   // Only one per priority!
-  LDBPairSet root_prio_set;
+  DBPairSet root_prio_set;
 
   // This is the write_flag.
   // It defines to which priority
   // writing is currently allowed.
-  LDBPrio write_flag;
+  DBPrio write_flag;
 };
 
 /// Interface class to the database
-class LDatabaseInterface
+class DatabaseInterface
 {
+  friend bool operator<(const DatabaseInterface& lhs, const DatabaseInterface& rhs);
+  friend bool operator>(const DatabaseInterface& lhs, const DatabaseInterface& rhs);
+
 public:
   /// Constructor.
-  LDatabaseInterface(const LID& lid,const std::string& section="") : my_LID(lid) , my_section(section)
+  DatabaseInterface(const ID& lid,const std::string& section="") : my_LID(lid) , my_section(section)
   { if(!my_section.empty()){ my_section+="."; } }
   /// Destructor.
-  virtual ~LDatabaseInterface() {};
+  virtual ~DatabaseInterface() {};
   /// Save method.
   /** This method has to be implemented by all derived classes.
       It is supposed to save the current data of the object to
       the database.*/
   virtual void Save() const = 0;
-  /// Returns the LID of the object.
-  LID GetLID() const { return my_LID; }
+  /// Returns the ID of the object.
+  ID GetID() const { return my_LID; }
 
 protected:
   std::set<void*> lazy_members;
@@ -297,16 +302,18 @@ protected:
   template<class T>
   void LazySaveArray(const std::string*& ref, const std::string& key) const;*/
 
-  /// Static reference to LDatabase object.
-  static LDatabase& LDB;
+  /// Static reference to Database object.
+  static Database& DB;
 
-  /// My LID.
-  LID my_LID;
+  /// My ID.
+  ID my_LID;
 
   /// Section
   std::string my_section;
 };
 
 #include "../lib/ldatabase_tpl.cpp"
+
+} // end LINA namespace
 
 #endif //LDATABASE_H

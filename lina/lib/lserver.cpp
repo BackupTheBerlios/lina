@@ -23,7 +23,7 @@
 
 using namespace Netxx;
 
-LServer::LServer()
+LINA::Server::Server()
 {
   try
   {
@@ -39,18 +39,18 @@ LServer::LServer()
   }
 }
 
-LServer::~LServer()
+LINA::Server::~Server()
 {
   delete stream_server;
   delete buffer;
 }
 
-void LServer::Run()
+void LINA::Server::Run()
 {
   HandleConnections();
 }
 
-void LServer::HandleConnections()
+void LINA::Server::HandleConnections()
 {
   try
   {
@@ -85,25 +85,27 @@ void LServer::HandleConnections()
         for(bool break_loop = false; !break_loop;)
         {
 
-          LNetPackage net_package;
+          LINA::NetPackage net_package;
           if(ReceivePackage(*client_stream, net_package) == -1)
             break;
 
           switch(net_package.type) 
           {
-          case LNetDisconnect: /* Disconnect client. */
+          case LINA::NetDisconnect: /* Disconnect client. */
             delete (*it).second;
             clients.erase(it);
 	    std::cout << " client disconnected from server" << std::endl;
 	    break_loop = true;
             break;
-          case LNetMessage:
-            std::cout<<"Message Received:"<<net_package.buffer<< std::endl;
+          case LINA::NetChatMessage:
+            std::cout<<"Message Received:"<<net_package.buffer.Get()<< std::endl;
             for(std::map<Netxx::Peer,Netxx::Stream*>::iterator sit = clients.begin(); sit != clients.end(); ++sit)
             {
               Netxx::Stream* other_client_stream = (*sit).second;
               SendPackage(*other_client_stream, net_package);
             }
+	    break;
+	  case LINA::NetClientInfo:
 	    break;
 	  default:
 	    break;

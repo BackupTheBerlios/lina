@@ -24,45 +24,83 @@
 #include <iostream>
 #include <netxx/tls/netxx.h>
 
+namespace LINA {
+
 extern const Netxx::port_type lina_port;
 
 /* This is NOT final and only for testing purposes right now.*/
 
 /* LINA Network Package Type. */
-enum LNetPT {
+enum NetPT {
 
-  LNetConnect = 0,
-  LNetDisconnect = 1,
-  LNetMessage = 2,
-  LNetUndefined = -1
+  /* Connection types. */
+  NetConnect,
+  NetDisconnect,
+  
+  /* Client information types. */
+  NetClientInfo,
+  
+  /* Database requests. */
+  NetDbRequest,
+  
+  /*Chat types. */
+  NetChatMessage,
+  
+  /* Undefined type. */
+  NetUndefined = -1
 
+};
+
+struct Buffer
+{
+Buffer() : buffer(NULL) , size(0) {};
+Buffer(std::string str) : size(str.size()+1) , buffer(new char[size]) { std::memcpy(buffer,str.c_str(),size); }
+Buffer(char* buf, unsigned int size_) : size(size_) ,buffer(new char[size]) { std::memcpy(buffer,buf,size); };
+~Buffer() { delete buffer; };
+
+void Allocate(unsigned size) { buffer = new char[size]; };
+char* Copy() { return (new char[size]); };
+char* Get() { return buffer; };
+const char* GetConst() const { return buffer; };
+unsigned Size() const { return size; };
+
+const unsigned* PSize() const { return &size; };
+
+private:
+char* buffer;
+unsigned size;
 };
 
 /* LINA Network Package. */
-class LNetPackage
+class NetPackage
 {
 public:
-  LNetPackage(LNetPT type_ = LNetUndefined) : type(type_), buffer(NULL), size(0) {};
-  LNetPackage(LNetPT type_, std::string buffer_) : type(type_) { size = buffer_.size()+1; buffer = new char[size]; std::memcpy(buffer,buffer_.c_str(),size); std::cout<<"BUFFER:"<<buffer<<std::endl;};
-  ~LNetPackage() { delete buffer; };
+  /* Constructor */
+  NetPackage(NetPT type_ = NetUndefined) : type(type_), buffer() {};
+  /* Constructor */
+  NetPackage(NetPT type_, std::string buffer_) : type(type_) , buffer(buffer_) {};
+  /* Constructor */
+  NetPackage(NetPT type_, char* buffer_, unsigned int size) : type(type_), buffer(buffer_,size) {};
+  ~NetPackage() {};
 
 public:
-  char* buffer;
-  unsigned int size;
-  LNetPT type;
+  Buffer buffer;
+  NetPT type;
 };
 
-/* Base class for LServer and LClient. */
-class LNetwork
+/* Base class for Server and Client. */
+class Network
 {
 public:
-  LNetwork() {};
-  int ReceivePackage(Netxx::Stream& net_stream, LNetPackage& net_package);
-  void SendPackage(Netxx::Stream& net_stream, const LNetPackage& net_package);
+  Network() {};
+  int ReceivePackage(Netxx::Stream& net_stream, NetPackage& net_package);
+  void SendPackage(Netxx::Stream& net_stream, const NetPackage& net_package);
 
 protected:
   char* buffer;
   Netxx::signed_size_type byte_count;
 };
+
+} // end LINA namespace
 
 #endif //LNETWORK_H

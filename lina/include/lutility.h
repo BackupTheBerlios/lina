@@ -25,24 +25,26 @@
 #include <iostream>
 #include <string>
 
-/// LDebug helps debugging
+namespace LINA {
+
+/// Debug helps debugging
 /** The first parameter is the debug-message and
     with the second one you can set wether the program
     should be hold or not.*/
 template<class T>
-void LDebug(const T& msg,bool hold=false)
+void Debug(const T& msg,bool hold=false)
 {
   std::cout<<"LDebug: "<<msg<<std::endl;
   if(hold)
     getc(stdin);
 }
 
-/// LDebug helps debugging
+/// Debug helps debugging
 /** The first parameter is the expected output, the second
     one is the output and with the third one you can set wether the program
     should be hold or not.*/
 template<class T,class C>
-void LDebug(const T& expected,const C& output,bool hold=false)
+void Debug(const T& expected,const C& output,bool hold=false)
 {
   std::cout<<"LDebug - Expected output:"<<std::endl;
   std::cout<<expected<<std::endl;
@@ -52,24 +54,24 @@ void LDebug(const T& expected,const C& output,bool hold=false)
     getc(stdin);
 }
 
-/// LPtr is LINA's smart pointer
+/// Ptr is LINA's smart pointer
 template <class T>
-class LPtr
+class Ptr
 {
 public:
   /// Constructor
-  LPtr(T* realPtr = 0) : pointee(realPtr) {};
+  Ptr(T* realPtr = 0) : pointee(realPtr) {};
   /// Constructor
-  LPtr(T value)
+  Ptr(T value)
   {
     pointee = new T(value);
   };
   /// Copy-constructor
-  LPtr(LPtr& rhs) : pointee(rhs.pointee) { rhs.pointee = 0; };
+  Ptr(Ptr& rhs) : pointee(rhs.pointee) { rhs.pointee = 0; };
   /// Destructor
-  ~LPtr() { delete pointee; };
+  ~Ptr() { delete pointee; };
   /// Operator=
-  LPtr& operator=(const LPtr& rhs)
+  Ptr& operator=(const Ptr& rhs)
   {
     if ( this != &rhs )
     {
@@ -80,7 +82,7 @@ public:
   };
 
   /// Operator=
-  LPtr& operator=(T* realPtr)
+  Ptr& operator=(T* realPtr)
   {
     if ( realPtr != pointee )
     {
@@ -114,5 +116,7 @@ private:
   // The real pointer
   T* pointee;
 };
+
+} // end LINA namespace
 
 #endif //LUTILITY_H

@@ -22,42 +22,45 @@
 
 using namespace std;
 
-LDatabase& LDatabaseInterface::LDB = LDatabase::Get();
+LINA::Database& LINA::DatabaseInterface::DB = LINA::Database::Get();
 
-bool operator<(const LDBPair& lhs, const LDBPair& rhs) { return ( lhs.second > rhs.second); };
-bool operator>(const LDBPair& lhs, const LDBPair& rhs) { return ( lhs.second < rhs.second); };
+bool LINA::operator<(const LINA::DBPair& lhs, const LINA::DBPair& rhs) { return ( lhs.second > rhs.second); };
+bool LINA::operator>(const LINA::DBPair& lhs, const LINA::DBPair& rhs) { return ( lhs.second < rhs.second); };
 
-bool operator<(const LID& lhs, const LID& rhs) { return ( lhs.catalog + lhs.token < rhs.catalog + rhs.token); };
-bool operator>(const LID& lhs, const LID& rhs) { return ( lhs.catalog + lhs.token > rhs.catalog + rhs.token); };
+bool LINA::operator<(const LINA::ID& lhs, const LINA::ID& rhs) { return ( lhs.catalog + lhs.token < rhs.catalog + rhs.token); };
+bool LINA::operator>(const LINA::ID& lhs, const LINA::ID& rhs) { return ( lhs.catalog + lhs.token > rhs.catalog + rhs.token); };
 
-bool operator==(const LID& lhs, const LID& rhs)
+bool LINA::operator<(const LINA::DatabaseInterface& lhs, const LINA::DatabaseInterface& rhs) { return ( lhs.my_LID  < rhs.my_LID ); };
+bool LINA::operator>(const LINA::DatabaseInterface& lhs, const LINA::DatabaseInterface& rhs) { return ( lhs.my_LID  > rhs.my_LID ); };
+
+bool operator==(const LINA::ID& lhs, const LINA::ID& rhs)
 {
   return (lhs.Catalog() == rhs.Catalog() && lhs.Token() == rhs.Token() );
 }
 
-std::ostream& operator<<(std::ostream& os, const LID& rv)
+std::ostream& LINA::operator<<(std::ostream& os, const LINA::ID& rv)
 {
   return os << rv.catalog << " " << rv.token;
 }
 
-std::istream& operator>>(std::istream& is, LID& rv)
+std::istream& LINA::operator>>(std::istream& is, LINA::ID& rv)
 {
   return is >> rv.catalog >> rv.token;
 }
 
-LID::LID(const string& lid_catalog, const string& lid_token) : catalog(lid_catalog),token(lid_token)
+LINA::ID::ID(const string& lid_catalog, const string& lid_token) : catalog(lid_catalog),token(lid_token)
 {}
 
-LID::LID(const LID& lid) : catalog(lid.catalog),token(lid.token)
+LINA::ID::ID(const LINA::ID& lid) : catalog(lid.catalog),token(lid.token)
 {}
 
-LDatabase& LDatabase::Get()
+LINA::Database& LINA::Database::Get()
 {
-  static LDatabase instance;
+  static LINA::Database instance;
   return instance;
 }
 
-bool LDatabase::AddRoot(const string& db_root)
+bool LINA::Database::AddRoot(const string& db_root)
 {
   ifstream file;
   //open the root-prio file
@@ -68,21 +71,21 @@ bool LDatabase::AddRoot(const string& db_root)
     //get the priority of this root
     char tmp[10];
     file.getline(tmp,10);
-    LDBPrio db_prio;
-    LStringToDigit(db_prio,tmp);
+    LINA::DBPrio db_prio;
+    LINA::StringToDigit(db_prio,tmp);
     if ( db_prio < 0 )
       db_prio = 0;
     //finaly add this root to the database
-    root_prio_set.insert(LDBPair(db_root,db_prio));
+    root_prio_set.insert(LINA::DBPair(db_root,db_prio));
     return true;
   }
   else
     return false;
 }
 
-void LDatabase::RemoveRoot(const string& db_root)
+void LINA::Database::RemoveRoot(const string& db_root)
 {
-  for(LDBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
+  for(LINA::DBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
   {
     if( (*it).first == db_root )
     {
@@ -92,9 +95,9 @@ void LDatabase::RemoveRoot(const string& db_root)
   }
 }
 
-void LDatabase::RemoveRoot(LDBPrio prio)
+void LINA::Database::RemoveRoot(LINA::DBPrio prio)
 {
-  for(LDBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
+  for(LINA::DBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
   {
     if( (*it).second == prio )
     {
@@ -104,13 +107,13 @@ void LDatabase::RemoveRoot(LDBPrio prio)
   }
 }
 
-void LDatabase::Clear()
+void LINA::Database::Clear()
 {
   //erase all data of root_prio_set
   root_prio_set.erase(root_prio_set.begin(),root_prio_set.end());
 }
 
-bool LDatabase::CreateRoot(const string& db_root, LDBPrio db_prio)
+bool LINA::Database::CreateRoot(const string& db_root, LINA::DBPrio db_prio)
 {
   //"/" as database root is no good idea
   if(db_root == "/")
@@ -136,11 +139,11 @@ bool LDatabase::CreateRoot(const string& db_root, LDBPrio db_prio)
   }
 }
 
-const string LDatabase::Read(const LID& lid,const string& key) const
+const string LINA::Database::Read(const LINA::ID& lid,const string& key) const
 {
 
-  LIDInfo lid_info = GetLIDInfo(lid);
-  for( LDBPairSet::iterator it = lid_info.root_prio_set.begin(); it != lid_info.root_prio_set.end(); ++it )
+  IDInfo lid_info = GetIDInfo(lid);
+  for( LINA::DBPairSet::iterator it = lid_info.root_prio_set.begin(); it != lid_info.root_prio_set.end(); ++it )
   {
     gzFile file = gzopen((((*it).first+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"rb");
 
@@ -181,11 +184,11 @@ const string LDatabase::Read(const LID& lid,const string& key) const
   return "";
 }
 
-void LDatabase::Read(const LID& lid,const string& key, string& value) const
+void LINA::Database::Read(const LINA::ID& lid,const string& key, string& value) const
 {
 
-  LIDInfo lid_info = GetLIDInfo(lid);
-  for( LDBPairSet::iterator it = lid_info.root_prio_set.begin(); it != lid_info.root_prio_set.end(); ++it )
+  IDInfo lid_info = GetIDInfo(lid);
+  for( LINA::DBPairSet::iterator it = lid_info.root_prio_set.begin(); it != lid_info.root_prio_set.end(); ++it )
   {
     gzFile file = gzopen((((*it).first+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"rb");
 
@@ -222,11 +225,11 @@ void LDatabase::Read(const LID& lid,const string& key, string& value) const
   }
 }
 
-void LDatabase::Read(const LID& lid,const string& key, stringstream& value) const
+void LINA::Database::Read(const LINA::ID& lid,const string& key, stringstream& value) const
 {
 
-  LIDInfo lid_info = GetLIDInfo(lid);
-  for( LDBPairSet::iterator it = lid_info.root_prio_set.begin(); it != lid_info.root_prio_set.end(); ++it )
+  IDInfo lid_info = GetIDInfo(lid);
+  for( LINA::DBPairSet::iterator it = lid_info.root_prio_set.begin(); it != lid_info.root_prio_set.end(); ++it )
   {
     gzFile file = gzopen((((*it).first+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"rb");
 
@@ -265,7 +268,7 @@ void LDatabase::Read(const LID& lid,const string& key, stringstream& value) cons
   }
 }
 
-void LDatabase::ReadArray(const LID& lid,const string& key,vector<string>& value_vector) const
+void LINA::Database::ReadArray(const LINA::ID& lid,const string& key,vector<string>& value_vector) const
 {
   //get the plain value
   string value = Read(lid,key);
@@ -285,7 +288,7 @@ void LDatabase::ReadArray(const LID& lid,const string& key,vector<string>& value
   }
 }
 
-int LDatabase::ReadArraySize(const LID& lid,const string& key) const
+int LINA::Database::ReadArraySize(const LINA::ID& lid,const string& key) const
 {
   //get the plain value
   string value = Read(lid,key);
@@ -301,11 +304,11 @@ int LDatabase::ReadArraySize(const LID& lid,const string& key) const
   return i;
 }
 
-int LDatabase::GetKeys(const LID& lid, set<string>& key_set) const
+int LINA::Database::GetKeys(const LINA::ID& lid, set<string>& key_set) const
   {
     int keys=0;
-    LIDInfo lid_info = GetLIDInfo(lid);
-    for( LDBPairSet::iterator it = lid_info.root_prio_set.begin(); it != lid_info.root_prio_set.end(); ++it )
+    IDInfo lid_info = GetIDInfo(lid);
+    for( LINA::DBPairSet::iterator it = lid_info.root_prio_set.begin(); it != lid_info.root_prio_set.end(); ++it )
     {
       gzFile file = gzopen((((*it).first+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"rb");
 
@@ -337,10 +340,10 @@ int LDatabase::GetKeys(const LID& lid, set<string>& key_set) const
     return keys;
   }
 
-void LDatabase::ReadPlainText(const LID& lid, std::string& text) const
+void LINA::Database::ReadPlainText(const LINA::ID& lid, std::string& text) const
 {
-  LIDInfo lid_info = GetLIDInfo(lid);
-  for( LDBPairSet::iterator it = lid_info.root_prio_set.begin(); it != lid_info.root_prio_set.end(); ++it )
+  IDInfo lid_info = GetIDInfo(lid);
+  for( LINA::DBPairSet::iterator it = lid_info.root_prio_set.begin(); it != lid_info.root_prio_set.end(); ++it )
   {
     gzFile file = gzopen((((*it).first+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"rb");
 
@@ -354,10 +357,10 @@ void LDatabase::ReadPlainText(const LID& lid, std::string& text) const
   }
 }
 
-void LDatabase::Erase(const LID& lid,const string& key) const
+void LINA::Database::Erase(const LINA::ID& lid,const string& key) const
 {
 
-  LDBPairSet::iterator it = root_prio_set.find(LDBPair("",write_flag));
+  LINA::DBPairSet::iterator it = root_prio_set.find(LINA::DBPair("",write_flag));
   if ( it != root_prio_set.end() )
   {
 
@@ -404,12 +407,12 @@ void LDatabase::Erase(const LID& lid,const string& key) const
 }
 
 
-void LDatabase::Write(const LID& lid, const string& key, const string& value) const
+void LINA::Database::Write(const LINA::ID& lid, const string& key, const string& value) const
 {
   //erase the current appearances of key
   Erase(lid,key);
 
-  LDBPairSet::iterator it = root_prio_set.find(LDBPair("",write_flag));
+  LINA::DBPairSet::iterator it = root_prio_set.find(LINA::DBPair("",write_flag));
   if ( it != root_prio_set.end() )
   {
     //open the file for appending
@@ -423,12 +426,12 @@ void LDatabase::Write(const LID& lid, const string& key, const string& value) co
 }
 
 
-void LDatabase::Write(const LID& lid, const string& key, const stringstream& value) const
+void LINA::Database::Write(const LINA::ID& lid, const string& key, const stringstream& value) const
 {
   //erase the current appearances of key
   Erase(lid,key);
 
-  LDBPairSet::iterator it = root_prio_set.find(LDBPair("",write_flag));
+  LINA::DBPairSet::iterator it = root_prio_set.find(LINA::DBPair("",write_flag));
   if ( it != root_prio_set.end() )
   {
     //open the file for appending
@@ -441,13 +444,13 @@ void LDatabase::Write(const LID& lid, const string& key, const stringstream& val
   }
 }
 
-int LDatabase::IterateLIDs(const string& lid_catalog, set<LID>& lid_set)
+int LINA::Database::IterateIDs(const string& lid_catalog, set<LINA::ID>& lid_set)
 {
   DIR   *dirStructP;
   dirent   *direntp;
 
   int lids=0;
-  for(LDBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
+  for(LINA::DBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
   {
     if((dirStructP = opendir(((*it).first+"/"+lid_catalog).c_str())) != NULL)
     {
@@ -455,7 +458,7 @@ int LDatabase::IterateLIDs(const string& lid_catalog, set<LID>& lid_set)
       {
         if ( direntp->d_type == DT_REG )
         {
-          lid_set.insert(LID(lid_catalog,direntp->d_name));
+          lid_set.insert(LINA::ID(lid_catalog,direntp->d_name));
           ++lids;
         }
       }
@@ -469,13 +472,13 @@ int LDatabase::IterateLIDs(const string& lid_catalog, set<LID>& lid_set)
   return lids;
 }
 
-int LDatabase::FindLIDs(const string& lid_catalog,const string& key,const string& value, set<LID>& lid_set)
+int LINA::Database::FindIDs(const string& lid_catalog,const string& key,const string& value, set<LINA::ID>& lid_set)
 {
   DIR   *dirStructP;
   dirent   *direntp;
 
   int lids=0;
-  for(LDBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
+  for(LINA::DBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
   {
     if((dirStructP = opendir(((*it).first+"/"+lid_catalog).c_str())) != NULL)
     {
@@ -483,9 +486,9 @@ int LDatabase::FindLIDs(const string& lid_catalog,const string& key,const string
       {
         if ( direntp->d_type == DT_REG )
         {
-          if ( Read(LID(lid_catalog,direntp->d_name),key) == value )
+          if ( Read(LINA::ID(lid_catalog,direntp->d_name),key) == value )
           {
-            lid_set.insert(LID(lid_catalog,direntp->d_name));
+            lid_set.insert(LINA::ID(lid_catalog,direntp->d_name));
             ++lids;
           }
         }
@@ -501,7 +504,7 @@ int LDatabase::FindLIDs(const string& lid_catalog,const string& key,const string
   return lids;
 }
 
-bool LDatabase::Fexists(const string& filename) const
+bool LINA::Database::Fexists(const string& filename) const
 {
   ifstream file;
   file.open(filename.c_str(), ios::in);
@@ -517,9 +520,9 @@ bool LDatabase::Fexists(const string& filename) const
   }
 }
 
-string LDatabase::FindTopPriorityRoot(const LID& lid) const
+string LINA::Database::FindTopPriorityRoot(const LINA::ID& lid) const
 {
-  for(LDBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
+  for(LINA::DBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
   {
     if( Fexists((*it).first+"/"+lid.Catalog()+"/"+lid.Token()) )
     {
@@ -530,9 +533,9 @@ string LDatabase::FindTopPriorityRoot(const LID& lid) const
 }
 
 //TODO - I'm pretty sure it doesnt work, but someone has to test this ;)
-void LDatabase::Clean(const LID& lid) const
+void LINA::Database::Clean(const LINA::ID& lid) const
 {
-  LDBPairSet::iterator it = root_prio_set.begin();
+  LINA::DBPairSet::iterator it = root_prio_set.begin();
   gzFile file = gzopen((((*it).first+"/"+lid.Catalog()+"/"+lid.Token()).c_str()),"rb");
 
   // write file contents to cout
@@ -570,20 +573,20 @@ void LDatabase::Clean(const LID& lid) const
 
 }
 
-LDatabase::LIDInfo LDatabase::GetLIDInfo(const LID& lid) const
+LINA::Database::IDInfo LINA::Database::GetIDInfo(const LINA::ID& lid) const
 {
-  LIDInfo lid_info;
-  for(LDBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
+  IDInfo lid_info;
+  for(LINA::DBPairSet::iterator it = root_prio_set.begin(); it != root_prio_set.end(); ++it)
   {
     if( Fexists((*it).first+"/"+lid.Catalog()+"/"+lid.Token()) )
     {
-      lid_info.root_prio_set.insert(LDBPair((*it).first,(*it).second));
+      lid_info.root_prio_set.insert(LINA::DBPair((*it).first,(*it).second));
     }
   }
   return lid_info;
 }
 
-void LDatabaseInterface::MakeLazy(void* address)
+void LINA::DatabaseInterface::MakeLazy(void* address)
 {
   if(lazy_members.find(address) == lazy_members.end())
   {

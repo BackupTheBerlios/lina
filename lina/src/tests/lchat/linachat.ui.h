@@ -12,7 +12,9 @@
 #include <qtimer.h>
 #include <ldefault.h>
 
-LClient client;
+using namespace LINA;
+
+Client client;
 std::vector<std::string> history;
 QTimer *timer;
 
@@ -23,20 +25,23 @@ void LINAChat::send_message()
     chat_textedit->append("<font color=\"yellow\">Trying to connect to "+chat_input->text().section(" ",1).simplifyWhiteSpace()+"</font>\n");
     QString server_to_connect(chat_input->text().section(" ",1).simplifyWhiteSpace());
     
-    client.ConnectTo(server_to_connect);
+    client.ConnectTo(server_to_connect.latin1());
+    /*std::string test;
+    std::cerr >> test;
+    chat_textedit->append(QString(test) + "\n");*/
   }
   else
   {
-    client.SendPackage(LNetPackage(LNetMessage,chat_input->text() ));
+    client.SendPackage(NetPackage(NetChatMessage,chat_input->text() ));
   }
-  history.push_back(chat_input->text());
+  history.push_back(chat_input->text().latin1());
   chat_input->clear();
 }
 
 
-void LINAChat::set_nick( std::string new_nick )
+void LINAChat::set_nick( QString new_nick )
 {
-  nickname_label->setText(new_nick);
+  nickname_label->setText(new_nick.latin1());
 }
 
 void LINAChat::init()
@@ -49,15 +54,14 @@ void LINAChat::init()
 
 void LINAChat::receive_messages()
 {
-  LNetPackage tmp;
+  NetPackage tmp;
   client.ReceivePackage(tmp);
-  if(tmp.buffer != NULL)
-    chat_textedit->append(QString(tmp.buffer) + "\n");
-
+  if(tmp.buffer.GetConst() != NULL && tmp.type == NetChatMessage)
+    chat_textedit->append(QString(tmp.buffer.GetConst()) + "\n");
 }
 
 
-void LINAChat::set_server(std::string server)
+void LINAChat::set_server(QString server)
 {
-  client.ConnectTo(server);
+  client.ConnectTo(server.latin1());
 }

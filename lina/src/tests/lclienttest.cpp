@@ -22,16 +22,16 @@
 #include <lclient.h>
 
 using namespace std;
-
+using namespace LINA;
 
 int main(int argc, char *argv[])
 {
-  LClient client;
+  Client client;
   for(;;)
   {
-  client.SendPackage(LNetPackage(LNetConnect,"\nHere I am! With Boost!\n"));
+  client.SendPackage(NetPackage(NetConnect,"\nHere I am! With Boost!\n"));
   
-  client.SendPackage(LNetPackage(LNetDisconnect,"\nAgain and Again!\n"));
+  client.SendPackage(NetPackage(NetDisconnect,"\nAgain and Again!\n"));
   sleep(2);
   }
 

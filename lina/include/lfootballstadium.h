@@ -24,20 +24,24 @@
 #include <lutility.h>
 #include <lstadium.h>
 
-class LFootballStadium : public LStadium
+namespace LINA {
+
+class FootballStadium : public Stadium
 {
 public:
-LFootballStadium(const LID& lid);
+FootballStadium(const ID& lid);
 
 private:
-LPtr<LTribune> tribune_nw;
-LPtr<LTribune> tribune_n;
-LPtr<LTribune> tribune_ne;
-LPtr<LTribune> tribune_w;
-LPtr<LTribune> tribune_e;
-LPtr<LTribune> tribune_sw;
-LPtr<LTribune> tribune_s;
-LPtr<LTribune> tribune_se;
+Ptr<Tribune> tribune_nw;
+Ptr<Tribune> tribune_n;
+Ptr<Tribune> tribune_ne;
+Ptr<Tribune> tribune_w;
+Ptr<Tribune> tribune_e;
+Ptr<Tribune> tribune_sw;
+Ptr<Tribune> tribune_s;
+Ptr<Tribune> tribune_se;
 };
+
+} // end LINA namespace
 
 #endif //LFOOTBALLSTADIUM_H

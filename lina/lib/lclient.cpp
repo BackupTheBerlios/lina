@@ -21,11 +21,10 @@
 #include <string.h>
 #include <iostream>
 #include <lclient.h>
-#include <lrand.h>
 
 using namespace Netxx;
 
-LClient::LClient(std::string uri)
+LINA::Client::Client(const std::string& uri)
 {
   connected = false;
   try
@@ -34,9 +33,8 @@ LClient::LClient(std::string uri)
     stream_client = new Stream(uri.c_str(),lina_port);
     Netxx::SockOpt sockopt(stream_client->get_socketfd());
     sockopt.set_non_blocking();
-    LRand rand;
-    internal_id = rand.RandInt();
     connected = true;
+    client_info = new ClientInfo();
   }
   catch (std::exception &e)
   {
@@ -44,23 +42,23 @@ LClient::LClient(std::string uri)
   }
 }
 
-void LClient::Reconnect()
+void LINA::Client::Reconnect()
 {
   delete stream_client;
   stream_client = new Stream("localhost",lina_port);
 }
 
-void LClient::Disconnect()
+void LINA::Client::Disconnect()
 {
   if(connected)
   {
-    SendPackage(LNetPackage(LNetDisconnect));
+    SendPackage(LINA::NetPackage(LINA::NetDisconnect));
     delete stream_client;
     connected = false;
   }
 }
 
-void LClient::ConnectTo(std::string uri)
+void LINA::Client::ConnectTo(const std::string &uri)
 {
   try
   {
@@ -77,21 +75,21 @@ void LClient::ConnectTo(std::string uri)
   }
 }
 
-LClient::~ LClient()
+LINA::Client::~ Client()
 {
   Disconnect();
 }
 
-int LClient::ReceivePackage(LNetPackage& net_package)
+int LINA::Client::ReceivePackage(LINA::NetPackage& net_package)
 {
 if(connected)
-  LNetwork::ReceivePackage(*stream_client,net_package);
+  LINA::Network::ReceivePackage(*stream_client,net_package);
 }
 
-void LClient::SendPackage(const LNetPackage& net_package)
+void LINA::Client::SendPackage(const LINA::NetPackage& net_package)
 {
 if(connected)
-  LNetwork::SendPackage(*stream_client,net_package);
+  LINA::Network::SendPackage(*stream_client,net_package);
 }
 
 

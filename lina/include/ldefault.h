@@ -32,5 +32,8 @@
 #include <lserver.h>
 #include <lclient.h>
 
-LDatabase& LDB = LDatabase::Get();
+namespace LINA {
 
+Database& DB = Database::Get();
+
+}

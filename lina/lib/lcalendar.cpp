@@ -22,77 +22,77 @@
 
 using namespace std;
 
-bool operator<(const LTime& lhs, const LTime& rhs) { return ( lhs.julian < rhs.julian || (lhs.julian == rhs.julian && lhs.seconds < rhs.seconds)); };
-bool operator>(const LTime& lhs, const LTime& rhs) { return ( lhs.julian > rhs.julian || (lhs.julian == rhs.julian && lhs.seconds > rhs.seconds)); };
+bool LINA::operator<(const LINA::Time& lhs, const LINA::Time& rhs) { return ( lhs.julian < rhs.julian || (lhs.julian == rhs.julian && lhs.seconds < rhs.seconds)); };
+bool LINA::operator>(const LINA::Time& lhs, const LINA::Time& rhs) { return ( lhs.julian > rhs.julian || (lhs.julian == rhs.julian && lhs.seconds > rhs.seconds)); };
 
-bool operator>=(const LTime &lhs, const LTime& rhs)
+bool LINA::operator>=(const LINA::Time &lhs, const LINA::Time& rhs)
 {
   return (lhs.julian > rhs.julian || (lhs.julian == rhs.julian && lhs.seconds >= rhs.seconds));
 }
 
-bool operator==(const LTime &lhs, const LTime& rhs)
+bool LINA::operator==(const LINA::Time &lhs, const LINA::Time& rhs)
 {
   return (lhs.julian == rhs.julian && lhs.seconds == rhs.seconds);
 }
 
 
-bool operator<(const LEvent& lhs, const LEvent& rhs) { return ( lhs.start < rhs.start); };
-bool operator>(const LEvent& lhs, const LEvent& rhs) { return ( lhs.start > rhs.start); };
+bool LINA::operator<(const LINA::Event& lhs, const LINA::Event& rhs) { return ( lhs.start < rhs.start); };
+bool LINA::operator>(const LINA::Event& lhs, const LINA::Event& rhs) { return ( lhs.start > rhs.start); };
 
-const short LTime::month_days[] =
+const short LINA::Time::month_days[] =
   {
     0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
   };
-const int LTime::first_gregorian_year	= 1752;
-const uint LTime::seconds_per_day	= 86400;
-const uint LTime::first_day	= 2361222;
+const int LINA::Time::first_gregorian_year	= 1752;
+const uint LINA::Time::seconds_per_day	= 86400;
+const uint LINA::Time::first_day	= 2361222;
 
-std::ostream& operator<<(std::ostream& os, const LTime& rv)
+std::ostream& LINA::operator<<(std::ostream& os, const LINA::Time& rv)
 {
   return os << rv.julian << " " << rv.seconds;
 }
 
-std::istream& operator>>(std::istream& is, LTime& rv)
+std::istream& LINA::operator>>(std::istream& is, LINA::Time& rv)
 {
   return is >> rv.julian >> rv.seconds;
 }
 
-std::ostream& operator<<(std::ostream& os, const LEvent& rv)
+std::ostream& LINA::operator<<(std::ostream& os, const LINA::Event& rv)
 {
-  return os << static_cast<LTimePeriod&>(const_cast<LEvent&>(rv)) << " " << *rv.event_id.lid << " " << rv.event_id.id;
+  return os << static_cast<LINA::TimePeriod&>(const_cast<LINA::Event&>(rv)) << " " << *rv.event_id.lid << " " << rv.event_id.id;
 }
 
-std::istream& operator>>(std::istream& is, LEvent& rv)
+std::istream& LINA::operator>>(std::istream& is, LINA::Event& rv)
 {
-  return is >> static_cast<LTimePeriod&>(rv) >> *rv.event_id.lid >> rv.event_id.id;
+  return is >> static_cast<LINA::TimePeriod&>(rv) >> *rv.event_id.lid >> rv.event_id.id;
 }
 
-LTime::LTime(const LTime& ltime)
+LINA::Time::Time(const LINA::Time& ltime)
 {
   julian = ltime.julian;
   seconds = ltime.seconds;
 }
 
-LTime::LTime(struct tm *dt)
+LINA::Time::Time(struct tm *dt)
 {
   ToSeconds(dt->tm_hour, dt->tm_min, dt->tm_sec);
   ToJulian(dt->tm_year, dt->tm_mon, dt->tm_mday);
 }
 
-LTime::LTime(time_t time)
+LINA::Time::Time(time_t time)
 {
   struct tm *dt = localtime(&time);
   ToSeconds(dt->tm_hour, dt->tm_min, dt->tm_sec);
   ToJulian(dt->tm_year + 1900, dt->tm_mon + 1, dt->tm_mday);
 }
 
-LTime::LTime(int year, int month, int day, int hour, int minute, int second) : seconds(0), julian(0)
+LINA::Time::Time(int year, int month, int day, int hour, int minute, int second) : seconds(0), julian(0)
 {
   SetYMD( year, month, day );
   SetHMS( hour, minute, second );
 }
 
-LTime::LTime(int year, int month, int day) : seconds(0), julian(0)
+LINA::Time::Time(int year, int month, int day) : seconds(0), julian(0)
 {
   SetYMD( year, month, day );
   
@@ -100,12 +100,12 @@ LTime::LTime(int year, int month, int day) : seconds(0), julian(0)
   asdf.numerator();
 }
 
-/*LTime::LTime(int year, int week, int weekday) : seconds(0), julian(0)
+/*LINA::Time::Time(int year, int week, int weekday) : seconds(0), julian(0)
 {
   SetYMD( year, week, weekday );
 }*/
 
-bool LTime::SetYMD( int year, int month, int day )
+bool LINA::Time::SetYMD( int year, int month, int day )
 {
   if ( Year() == year && Month() == month && Day() == day )
     return IsValidDate();
@@ -117,7 +117,7 @@ bool LTime::SetYMD( int year, int month, int day )
   return true;
 }
 
-bool LTime::SetHMS( int hour, int minute, int second)
+bool LINA::Time::SetHMS( int hour, int minute, int second)
 {
   if ( !IsValidTime(hour,minute,second) )
   {
@@ -128,12 +128,12 @@ bool LTime::SetHMS( int hour, int minute, int second)
   return true;
 }
 
-bool LTime::SetYWD( int year, int week, int weekday)
+bool LINA::Time::SetYWD( int year, int week, int weekday)
 {
 ToJulian(year,1,1);
 }
 
-int LTime::DaysInMonth() const
+int LINA::Time::DaysInMonth() const
 {
   int y, m, d;
   ToGregorian( y, m, d );
@@ -143,17 +143,17 @@ int LTime::DaysInMonth() const
     return month_days[m];
 }
 
-void LTime::AddDays(int days)
+void LINA::Time::AddDays(int days)
 {
   julian += days;
 }
 
-void LTime::AddWeeks(int weeks)
+void LINA::Time::AddWeeks(int weeks)
 {
   julian += weeks*7;
 }
 
-void LTime::AddMonths(int months)
+void LINA::Time::AddMonths(int months)
 {
   int y, m, d;
   ToGregorian( y, m, d );
@@ -175,27 +175,27 @@ void LTime::AddMonths(int months)
     }
   }
 
-  if( d > LTime(y,m,1).DaysInMonth() )
-    d = LTime(y,m,1).DaysInMonth();
+  if( d > LINA::Time(y,m,1).DaysInMonth() )
+    d = LINA::Time(y,m,1).DaysInMonth();
 
   ToJulian(y,m,d);
 
 }
 
-void LTime::AddYears(int years)
+void LINA::Time::AddYears(int years)
 {
   int y, m, d;
   ToGregorian( y, m, d );
   y += years;
 
 
-  if( d > LTime(y,m,1).DaysInMonth() )
-    d = LTime(y,m,1).DaysInMonth();
+  if( d > LINA::Time(y,m,1).DaysInMonth() )
+    d = LINA::Time(y,m,1).DaysInMonth();
 
   ToJulian(y,m,d);
 }
 
-void LTime::AddSeconds(int secs)
+void LINA::Time::AddSeconds(int secs)
 {
   if ( secs < 0 )
   {
@@ -210,53 +210,53 @@ void LTime::AddSeconds(int secs)
   }
 }
 
-void LTime::AddMinutes(int mins)
+void LINA::Time::AddMinutes(int mins)
 {
   AddSeconds(mins*60);
 }
 
-void LTime::AddHours(int hours)
+void LINA::Time::AddHours(int hours)
 {
   AddSeconds(hours*3600);
 }
 
-int LTime::Year() const
+int LINA::Time::Year() const
 {
   int y, m, d;
   ToGregorian( y, m, d );
   return y;
 }
 
-int LTime::Month() const
+int LINA::Time::Month() const
 {
   int y, m, d;
   ToGregorian( y, m, d );
   return m;
 }
 
-int LTime::Day() const
+int LINA::Time::Day() const
 {
   int y, m, d;
   ToGregorian( y, m, d );
   return d;
 }
 
-int LTime::Hour() const
+int LINA::Time::Hour() const
 {
   return seconds / 3600;
 }
 
-int LTime::Minute() const
+int LINA::Time::Minute() const
 {
   return (seconds % 3600)/60;
 }
 
-int LTime::Second() const
+int LINA::Time::Second() const
 {
   return seconds % 60;
 }
 
-bool LTime::IsValidDate( int year, int month, int day )
+bool LINA::Time::IsValidDate( int year, int month, int day )
 {
   if ( year >= 0 && year <= 99 )
     year += 1900;
@@ -267,38 +267,38 @@ bool LTime::IsValidDate( int year, int month, int day )
          (day <= month_days[month] || (day == 29 && month == 2 && LeapYear(year)));
 }
 
-bool LTime::IsValidDate() const
+bool LINA::Time::IsValidDate() const
 {
   return julian >= first_day;
   static const uint FIRST_DAY	= 2361222;	// Julian day for 1752-09-14
 }
 
-bool LTime::IsValidTime() const
+bool LINA::Time::IsValidTime() const
 {
   return seconds < seconds_per_day;
 }
 
-bool LTime::IsValidTime( int hour, int minute, int second )
+bool LINA::Time::IsValidTime( int hour, int minute, int second )
 {
   return (uint)hour < 24 && (uint)minute < 60 && (uint)second < 60;
 }
 
-bool LTime::LeapYear( int year ) const
+bool LINA::Time::LeapYear( int year ) const
 {
   return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
 }
 
-int LTime::SecondsTo(const LTime& to)
+int LINA::Time::SecondsTo(const LINA::Time& to)
 {
 return to.seconds - seconds;
 }
 
-int LTime::DaysTo(const LTime& to)
+int LINA::Time::DaysTo(const LINA::Time& to)
 {
 return to.julian - julian;
 }
 
-void LTime::ToJulian(int year, int month, int day)
+void LINA::Time::ToJulian(int year, int month, int day)
 {
   unsigned long c, ya;
   if ( year <= 99 )
@@ -318,7 +318,7 @@ void LTime::ToJulian(int year, int month, int day)
   julian = 1721119 + day + (146097*c)/4 + (1461*ya)/4 + (153*month+2)/5;
 }
 
-void LTime::ToGregorian(int &year, int &month, int &day ) const
+void LINA::Time::ToGregorian(int &year, int &month, int &day ) const
 {
   uint x;
   uint j = julian - 1721119;
@@ -343,20 +343,20 @@ void LTime::ToGregorian(int &year, int &month, int &day ) const
   }
 }
 
-std::ostream& operator<<(std::ostream& os, const LTimePeriod& rv)
+std::ostream& LINA::operator<<(std::ostream& os, const LINA::TimePeriod& rv)
 {
   return os << rv.start << " " << rv.end;
 }
 
-std::istream& operator>>(std::istream& is, LTimePeriod& rv)
+std::istream& LINA::operator>>(std::istream& is, LINA::TimePeriod& rv)
 {
   return is >> rv.start >> rv.end;
 }
 
-void LCalendar::Save() const
+void LINA::Calendar::Save() const
   {}
 
-EventStatusEnum LCalendar::EventStatus(const LEvent& event) const
+LINA::EventStatusEnum LINA::Calendar::EventStatus(const LINA::Event& event) const
 {
   if( current_time > event.start)
     return EventNotStarted;
@@ -370,14 +370,14 @@ EventStatusEnum LCalendar::EventStatus(const LEvent& event) const
     return EventFinished;
 }
 
-void LCalendar::TakeOldEvents()
+void LINA::Calendar::TakeOldEvents()
 {
-  for(std::set<LEvent>::iterator it = event_list.begin(); it != event_list.end(); ++it)
+  for(std::set<LINA::Event>::iterator it = event_list.begin(); it != event_list.end(); ++it)
     {
       if((*it).start >= current_time)
       {
         --it;
-        for(std::set<LEvent>::iterator s_it = event_list.begin(); s_it != it; ++s_it)
+        for(std::set<LINA::Event>::iterator s_it = event_list.begin(); s_it != it; ++s_it)
           {
             if((*s_it).end < current_time)
             {
