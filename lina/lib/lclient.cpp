@@ -35,6 +35,7 @@ LINA::Client::Client(const std::string& uri)
     sockopt.set_non_blocking();
     connected = true;
     client_info = new ClientInfo();
+    SendClientInfo();
   }
   catch (std::exception &e)
   {
@@ -62,12 +63,12 @@ void LINA::Client::ConnectTo(const std::string &uri)
 {
   try
   {
-  Disconnect();
+    Disconnect();
 
-  stream_client = new Stream(uri.c_str(),lina_port);
-  Netxx::SockOpt sockopt(stream_client->get_socketfd());
-  sockopt.set_non_blocking();
-  connected = true;
+    stream_client = new Stream(uri.c_str(),lina_port);
+    Netxx::SockOpt sockopt(stream_client->get_socketfd());
+    sockopt.set_non_blocking();
+    connected = true;
   }
   catch (std::exception &e)
   {
@@ -82,14 +83,62 @@ LINA::Client::~ Client()
 
 int LINA::Client::ReceivePackage(LINA::NetPackage& net_package)
 {
-if(connected)
-  LINA::Network::ReceivePackage(*stream_client,net_package);
+  if(connected)
+   return LINA::Network::ReceivePackage(*stream_client,net_package);
+  else
+   return -1;
 }
 
 void LINA::Client::SendPackage(const LINA::NetPackage& net_package)
 {
-if(connected)
-  LINA::Network::SendPackage(*stream_client,net_package);
+  if(connected)
+    LINA::Network::SendPackage(*stream_client,net_package);
 }
+
+void LINA::Client::SendClientInfo()
+{
+  if(!connected)
+    return;
+
+  LINA::Network::SendClientInfo(*stream_client,*client_info);
+}
+
+void LINA::Client::SetClientInfo(std::string nick)
+{
+if(!connected)
+return;
+
+  client_info->SetNickname(nick);
+  SendClientInfo();
+}
+
+void LINA::Client::HandleClientInfo(const LINA::NetPackage& netpackage)
+{
+  if(netpackage.type != LINA::NetClientInfo && netpackage.type != LINA::NetRemoveClientInfo)
+    return;
+
+  LINA::ClientInfo cinfo;
+  cinfo.SetID(*(static_cast<const int*>(netpackage.buffer.Void())));
+  cinfo.SetNickname(netpackage.buffer.Get()+sizeof(int));
+  std::set<LINA::ClientInfo>::iterator it;
+  
+  if((it = clients.find(cinfo)) != clients.end())
+  {
+    if(netpackage.type == LINA::NetRemoveClientInfo)
+    {
+      clients.erase(it);
+      return;
+    }
+    LINA::ClientInfo* ci = const_cast<LINA::ClientInfo*>(&(*it));
+    ci->SetNickname(cinfo.Nickname());
+  }
+  else if(netpackage.type != LINA::NetRemoveClientInfo)
+  {
+    clients.insert(cinfo);
+  }
+}
+
+
+
 
 

@@ -30,14 +30,15 @@ bool LINA::operator>=(const LINA::Time &lhs, const LINA::Time& rhs)
   return (lhs.julian > rhs.julian || (lhs.julian == rhs.julian && lhs.seconds >= rhs.seconds));
 }
 
+bool LINA::operator<=(const LINA::Time &lhs, const LINA::Time& rhs)
+{
+  return (lhs.julian < rhs.julian || (lhs.julian == rhs.julian && lhs.seconds <= rhs.seconds));
+}
+
 bool LINA::operator==(const LINA::Time &lhs, const LINA::Time& rhs)
 {
   return (lhs.julian == rhs.julian && lhs.seconds == rhs.seconds);
 }
-
-
-bool LINA::operator<(const LINA::Event& lhs, const LINA::Event& rhs) { return ( lhs.start < rhs.start); };
-bool LINA::operator>(const LINA::Event& lhs, const LINA::Event& rhs) { return ( lhs.start > rhs.start); };
 
 const short LINA::Time::month_days[] =
   {
@@ -95,7 +96,7 @@ LINA::Time::Time(int year, int month, int day, int hour, int minute, int second)
 LINA::Time::Time(int year, int month, int day) : seconds(0), julian(0)
 {
   SetYMD( year, month, day );
-  
+
   asdf = 1;
   asdf.numerator();
 }
@@ -130,7 +131,7 @@ bool LINA::Time::SetHMS( int hour, int minute, int second)
 
 bool LINA::Time::SetYWD( int year, int week, int weekday)
 {
-ToJulian(year,1,1);
+  ToJulian(year,1,1);
 }
 
 int LINA::Time::DaysInMonth() const
@@ -290,12 +291,12 @@ bool LINA::Time::LeapYear( int year ) const
 
 int LINA::Time::SecondsTo(const LINA::Time& to)
 {
-return to.seconds - seconds;
+  return to.seconds - seconds;
 }
 
 int LINA::Time::DaysTo(const LINA::Time& to)
 {
-return to.julian - julian;
+  return to.julian - julian;
 }
 
 void LINA::Time::ToJulian(int year, int month, int day)
@@ -358,21 +359,17 @@ void LINA::Calendar::Save() const
 
 LINA::EventStatusEnum LINA::Calendar::EventStatus(const LINA::Event& event) const
 {
-  if( current_time > event.start)
+  if( current_time < event.start)
     return EventNotStarted;
-  else if ( current_time == event.start)
-    return EventStart;
-  else if ( current_time > event.start && current_time < event.end )
+  else if ( current_time >= event.start && current_time <= event.end )
     return EventOngoing;
-  else if ( current_time == event.end)
-    return EventEnd;
   else if ( current_time > event.end)
     return EventFinished;
 }
 
 void LINA::Calendar::TakeOldEvents()
 {
-  for(std::set<LINA::Event>::iterator it = event_list.begin(); it != event_list.end(); ++it)
+  /*for(std::set<LINA::Event>::iterator it = event_list.begin(); it != event_list.end(); ++it)
     {
       if((*it).start >= current_time)
       {
@@ -386,5 +383,59 @@ void LINA::Calendar::TakeOldEvents()
           }
         break;
       }
-    }
+    }*/
 };
+
+bool LINA::Calendar::InsertEvent(const LINA::Event& event)
+{
+  switch(EventStatus(event))
+  {
+  case EventNotStarted:
+    events_notstarted.insert(event);
+    break;
+  case EventOngoing:
+    events_ongoing.insert(event);
+    break;
+  case EventFinished:
+    events_finished.insert(event);
+    break;
+  default:
+    break;
+  }
+}
+
+void LINA::Calendar::SortEvents()
+{
+  for(LINA::EventSetSS::iterator it = events_notstarted.begin(); it != events_notstarted.end(); ++it)
+    {
+      if(EventStatus(*it) == EventOngoing)
+      {
+        events_ongoing.insert(*it);
+        events_notstarted.erase(it);
+      }
+      else
+      {
+        break;
+      }
+    }
+  for(LINA::EventSetSE::iterator it = events_ongoing.begin(); it != events_ongoing.end(); ++it)
+    {
+      if(EventStatus(*it) == EventFinished)
+      {
+        events_finished.insert(*it);
+        events_ongoing.erase(it);
+      }
+      else
+      {
+        break;
+      }
+    }
+}
+
+const std::set<LINA::Event,LINA::TimePeriod::SortEnd>* LINA::Calendar::PollEvents()
+{
+  SortEvents();
+
+  return static_cast<const std::set<LINA::Event,LINA::TimePeriod::SortEnd>*>(&events_ongoing);
+}
+

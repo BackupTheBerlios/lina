@@ -69,8 +69,14 @@ void LINA::Server::HandleConnections()
       }
       else
       {
-        clients.insert(std::pair<Netxx::Peer,Netxx::Stream*>(client, new Netxx::Stream(client.get_socketfd())));
+        Netxx::Stream* client_stream = new Netxx::Stream(client.get_socketfd());
+        for(ClientMap::iterator it = clients.begin(); it != clients.end(); ++it)
+        {
+          LINA::Network::SendClientInfo(*client_stream,(*it).second.second);
+        }
+        clients.insert( ClientMap::value_type( client, std::pair<Netxx::Stream*, ClientInfo>(client_stream , ClientInfo()) ) );
         /* Who connected? IP:PORT */
+
         std::cout << " connection from " << client << std::endl;
       }
       /* Set up stream with the client. */
@@ -79,9 +85,9 @@ void LINA::Server::HandleConnections()
       /* Counts the incoming bytes. */
       Netxx::signed_size_type bytes_read;
 
-      for(std::map<Netxx::Peer,Netxx::Stream*>::iterator it = clients.begin(); it != clients.end(); ++it)
+      for(ClientMap::iterator it = clients.begin(); it != clients.end(); ++it)
       {
-        Netxx::Stream* client_stream = (*it).second;
+        Netxx::Stream* client_stream = (*it).second.first;
         for(bool break_loop = false; !break_loop;)
         {
 
@@ -89,26 +95,45 @@ void LINA::Server::HandleConnections()
           if(ReceivePackage(*client_stream, net_package) == -1)
             break;
 
-          switch(net_package.type) 
+          switch(net_package.type)
           {
           case LINA::NetDisconnect: /* Disconnect client. */
-            delete (*it).second;
+            for(ClientMap::iterator sit = clients.begin(); sit != clients.end(); ++sit)
+            {
+              if(sit == it)
+                continue;
+
+              Netxx::Stream* other_client_stream = (*sit).second.first;
+              LINA::Network::SendClientInfo(*other_client_stream,(*it).second.second,true);
+            }
+            delete (*it).second.first;
             clients.erase(it);
-	    std::cout << " client disconnected from server" << std::endl;
-	    break_loop = true;
+            std::cout << " client disconnected from server" << std::endl;
+            break_loop = true;
             break;
           case LINA::NetChatMessage:
             std::cout<<"Message Received:"<<net_package.buffer.Get()<< std::endl;
-            for(std::map<Netxx::Peer,Netxx::Stream*>::iterator sit = clients.begin(); sit != clients.end(); ++sit)
+            for(ClientMap::iterator sit = clients.begin(); sit != clients.end(); ++sit)
             {
-              Netxx::Stream* other_client_stream = (*sit).second;
+              Netxx::Stream* other_client_stream = (*sit).second.first;
               SendPackage(*other_client_stream, net_package);
             }
-	    break;
-	  case LINA::NetClientInfo:
-	    break;
-	  default:
-	    break;
+            break;
+          case LINA::NetClientInfo:
+
+            std::cout << (*it).second.second.Nickname();
+            (*it).second.second.SetID(*(static_cast<int*>(net_package.buffer.Void())));
+            (*it).second.second.SetNickname(net_package.buffer.Get()+sizeof(int));
+            std::cout << " is now known as " << (*it).second.second.Nickname() << std::endl;
+
+            for(ClientMap::iterator sit = clients.begin(); sit != clients.end(); ++sit)
+            {
+              Netxx::Stream* other_client_stream = (*sit).second.first;
+              SendPackage(*other_client_stream, net_package);      
+            }
+            break;
+          default:
+            break;
           }
 
           /* For testing only! */

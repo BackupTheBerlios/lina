@@ -20,27 +20,30 @@
 
 #ifndef LSERVER_H
 #define LSERVER_H
- 
+
 #include <map>
 #include <lnetwork.h>
 #include <lclient.h>
 
-namespace LINA {
-
-class Server : public Network
+namespace LINA
 {
-public:
- Server();
- ~Server();
- void Run();
- 
-private:
-void HandleConnections();
 
-Netxx::StreamServer* stream_server;
-Netxx::Timeout timeout;
-std::map<Netxx::Peer,Netxx::Stream*> clients;
-};
+  class Server : public Network
+  {
+  public:
+    Server();
+    ~Server();
+    void Run();
+
+  private:
+    void HandleConnections();
+
+    Netxx::StreamServer* stream_server;
+    Netxx::Timeout timeout;
+    
+    typedef std::map<Netxx::Peer,std::pair<Netxx::Stream*, ClientInfo> > ClientMap;
+    ClientMap clients;
+  };
 
 } // end LINA namespace
 

@@ -29,9 +29,9 @@ int main(int argc, char *argv[])
   Client client;
   for(;;)
   {
-  client.SendPackage(NetPackage(NetConnect,"\nHere I am! With Boost!\n"));
+  client.SendPackage(NetPackage(NetConnect, Buffer("\nHere I am! With Boost!\n")));
   
-  client.SendPackage(NetPackage(NetDisconnect,"\nAgain and Again!\n"));
+  client.SendPackage(NetPackage(NetDisconnect,Buffer("\nAgain and Again!\n")));
   sleep(2);
   }
 

@@ -22,84 +22,112 @@
 #define LNETWORK_H
 
 #include <iostream>
-#include <netxx/tls/netxx.h>
+#include <vector>
 
-namespace LINA {
+#include <netxx/netxx.h>
+#include <lrand.h>
 
-extern const Netxx::port_type lina_port;
-
-/* This is NOT final and only for testing purposes right now.*/
-
-/* LINA Network Package Type. */
-enum NetPT {
-
-  /* Connection types. */
-  NetConnect,
-  NetDisconnect,
-  
-  /* Client information types. */
-  NetClientInfo,
-  
-  /* Database requests. */
-  NetDbRequest,
-  
-  /*Chat types. */
-  NetChatMessage,
-  
-  /* Undefined type. */
-  NetUndefined = -1
-
-};
-
-struct Buffer
+namespace LINA
 {
-Buffer() : buffer(NULL) , size(0) {};
-Buffer(std::string str) : size(str.size()+1) , buffer(new char[size]) { std::memcpy(buffer,str.c_str(),size); }
-Buffer(char* buf, unsigned int size_) : size(size_) ,buffer(new char[size]) { std::memcpy(buffer,buf,size); };
-~Buffer() { delete buffer; };
 
-void Allocate(unsigned size) { buffer = new char[size]; };
-char* Copy() { return (new char[size]); };
-char* Get() { return buffer; };
-const char* GetConst() const { return buffer; };
-unsigned Size() const { return size; };
+  extern const Netxx::port_type lina_port;
 
-const unsigned* PSize() const { return &size; };
+  /* This is NOT final and only for testing purposes right now.*/
 
-private:
-char* buffer;
-unsigned size;
-};
+  /* LINA Network Package Type. */
+  enum NetPT {
 
-/* LINA Network Package. */
-class NetPackage
-{
-public:
-  /* Constructor */
-  NetPackage(NetPT type_ = NetUndefined) : type(type_), buffer() {};
-  /* Constructor */
-  NetPackage(NetPT type_, std::string buffer_) : type(type_) , buffer(buffer_) {};
-  /* Constructor */
-  NetPackage(NetPT type_, char* buffer_, unsigned int size) : type(type_), buffer(buffer_,size) {};
-  ~NetPackage() {};
+    /* Connection types. */
+    NetConnect,
+    NetDisconnect,
 
-public:
-  Buffer buffer;
-  NetPT type;
-};
+    /* Client information types. */
+    NetClientInfo,
+    NetRemoveClientInfo,
 
-/* Base class for Server and Client. */
-class Network
-{
-public:
-  Network() {};
-  int ReceivePackage(Netxx::Stream& net_stream, NetPackage& net_package);
-  void SendPackage(Netxx::Stream& net_stream, const NetPackage& net_package);
+    /* Database requests. */
+    NetDbRequest,
 
-protected:
-  char* buffer;
-  Netxx::signed_size_type byte_count;
-};
+    /*Chat types. */
+    NetChatMessage,
+
+    /* Undefined type. */
+    NetUndefined = -1
+
+  };
+
+  struct Buffer
+  {  
+    Buffer() {};
+    //Copy constructor
+    Buffer(const Buffer& buffer_) { buffer = buffer_.buffer; };
+    Buffer(std::string str) { buffer.resize(str.size() + 1); std::copy(str.c_str(),str.c_str()+str.size()+1,buffer.begin()); }
+    Buffer(const char* buf, unsigned int size_) { buffer.resize(size_); std::copy(buf,buf+size_,buffer.begin());};
+    Buffer(const void* buf, unsigned int size_) { buffer.resize(size_); std::copy(static_cast<const char*>(buf),static_cast<const char*>(buf)+size_,buffer.begin());};
+    
+    char* Get() { return &(*buffer.begin()); };
+    const char* Get() const { return &(*buffer.begin()); };    
+    void* Void() { return &(*buffer.begin()); };
+    const void* Void() const { return &(*buffer.begin()); };
+    
+    Netxx::size_type Size() const { return buffer.size(); }
+    Netxx::size_type* SizePointer() const {  NetxxSize() = buffer.size(); return &NetxxSize(); };
+    void Resize(const Netxx::size_type& new_size) { buffer.resize(new_size);};
+    
+    Buffer &operator+= (const Buffer&);
+
+    static Netxx::size_type& NetxxSize() {  static Netxx::size_type instance; return instance;};
+    
+  private:
+    std::vector<char> buffer;
+  };
+
+  /* LINA Network Package. */
+  class NetPackage
+  {
+  public:
+    /* Constructor */
+    NetPackage(NetPT type_ = NetUndefined) : type(type_) {};
+    /* Constructor */
+    NetPackage(NetPT type_, const Buffer& buffer_) : type(type_) , buffer(buffer_) {};
+    ~NetPackage() {};
+
+  public:
+    Buffer buffer;
+    NetPT type;
+  };
+
+  class ClientInfo
+  {
+
+  friend bool operator<(const ClientInfo& lhs, const ClientInfo& rhs) { return lhs.client_id < rhs.client_id; }
+  friend bool operator>(const ClientInfo& lhs, const ClientInfo& rhs) { return lhs.client_id > rhs.client_id; }
+  
+  public:
+    ClientInfo(std::string nick = "unknown") {nickname = nick; LINA::Random rand; client_id = rand.RandInt(); }
+    //returns true, if the nickname changed
+    bool SetNickname(const std::string& nick) { if(nick != nickname ) {nickname = nick; return true;} else { return false; } }
+    bool SetID(int id) { client_id = id; }
+    const std::string Nickname() const {return nickname; }
+    int ClientID() const { return client_id; }
+  private:
+    std::string nickname;
+    int client_id;
+  };
+  
+  /* Base class for Server and Client. */
+  class Network
+  {
+  public:
+    Network() {};
+    int ReceivePackage(Netxx::Stream& net_stream, NetPackage& net_package);
+    void SendPackage(Netxx::Stream& net_stream, const NetPackage& net_package);
+    void SendClientInfo(Netxx::Stream& net_stream, const ClientInfo& client_info, bool remove = false);
+
+  protected:
+    char* buffer;
+    Netxx::signed_size_type byte_count;
+  };
 
 } // end LINA namespace
 

@@ -91,16 +91,17 @@ int main(int argc, char *argv[])
       
   cal.InsertEvent(tz);
     
-  Event* leventptr;
-  leventptr = cal.NextEvent();
+  const EventSetSE* leventptr;
+  leventptr = cal.PollEvents();
   
-  if(leventptr->EventLID().Catalog() == "foo")
+  for(EventSetSE::iterator it = leventptr->begin(); it != leventptr->end(); ++it)
   {
-  sta.HandleEvent(*leventptr);
+    if((*it).EventLID().Catalog() == "foo")
+    {
+     sta.HandleEvent((*it));
+    }
   }
-  
-  Debug(*leventptr);
-  
+
   
   
   cal.Save();

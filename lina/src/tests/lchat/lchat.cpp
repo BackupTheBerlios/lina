@@ -53,32 +53,13 @@ int main(int argc, char *argv[])
   }
   
   cout << "Your nickname is: "<< nick << endl;
-  mylinachat->set_nick(nick.c_str());
+
   if(!server.empty())
   mylinachat->set_server(server.c_str());
+
+  mylinachat->set_nick(nick.c_str());
   
   return myapp.exec();
   
-
-  /*
-  
-  for(;;)
-  {
-    string input;
-    cin >> input;
-
-    
-    NetPackage tmp;
-    
-    cout << "SendITTT" << endl;
-    
-    client.ReceivePackage(tmp);
-    
-    cout<< tmp.buffer << endl;
-        
-    cout << endl;
-  }
-
-  return EXIT_SUCCESS;*/
 }
 

@@ -21,42 +21,37 @@
 #ifndef LCLIENT_H
 #define LCLIENT_H
 
+#include <set>
 #include <iostream>
 #include <lnetwork.h>
 #include <lrand.h>
 
-namespace LINA {
-
-class ClientInfo
+namespace LINA
 {
-public:
-  ClientInfo(std::string nick = "unknown") {nickname = nick; LINA::Random rand; client_id = rand.RandInt(); }
-  std::string Nickname() {return nickname; }
-  int ClientID() { return client_id; }
-private:
-  std::string nickname;
-  int client_id;
-};
 
-class Client : public Network
-{
-public:
-  Client(const std::string &uri = "localhost");
-  ~Client();
-  void Reconnect();
-  void Disconnect();
-  void ConnectTo(const std::string &uri = "localhost");
-  int ReceivePackage(NetPackage& net_package);
-  void SendPackage(const NetPackage& net_package);
-  bool IsConnected() { return connected; };
+  class Client : public Network
+  {
+  public:
+    Client(const std::string &uri = "localhost");
+    ~Client();
+    void Reconnect();
+    void Disconnect();
+    void ConnectTo(const std::string &uri = "localhost");
+    int ReceivePackage(NetPackage& net_package);
+    void SendPackage(const NetPackage& net_package);
+    bool IsConnected() { return connected; };
+    void SetClientInfo(std::string nick);
+    void HandleClientInfo(const NetPackage& netpackage);
+    const std::set<ClientInfo>* GetClientsInformation() const { return &clients; };
 
-private:
-  Netxx::Timeout timeout;
-  Netxx::Stream* stream_client;
-  ClientInfo* client_info;
-  std::vector<ClientInfo> clients;
-  bool connected;
-};
+  private:
+    void SendClientInfo();
+    Netxx::Timeout timeout;
+    Netxx::Stream* stream_client;
+    ClientInfo* client_info;
+    std::set<ClientInfo> clients;
+    bool connected;
+  };
 } // end LINA namespace
 
 #endif //LCLIENT_H
