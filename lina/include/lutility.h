@@ -62,8 +62,7 @@ public:
   /// Constructor
   LPtr(T value)
   {
-    pointee = new T;
-    *pointee = value;
+    pointee = new T(value);
   };
   /// Copy-constructor
   LPtr(const LPtr& rhs) : pointee(rhs) {};
