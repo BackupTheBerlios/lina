@@ -80,6 +80,17 @@ public:
     return *this;
   };
 
+  /// Operator=
+  LPtr& operator=(T* realPtr)
+  {
+    if ( realPtr != pointee )
+    {
+      delete pointee;
+      pointee = realPtr;
+    }
+    return *this;
+  };
+
   /// -> operator
   T* operator-> () const { return pointee; };
   /// Dereferencing operator
@@ -95,7 +106,7 @@ public:
   };
 
   /// Converts to a reference of a real pointer
-operator T*&() { return pointee; };
+  operator T*&() { return pointee; };
 
   /// Converts to a reference of a real pointer
   operator T* const&() const { return pointee; };
