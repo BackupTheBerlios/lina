@@ -27,6 +27,8 @@ using namespace Netxx;
 LINA::Client::Client(const std::string& uri)
 {
   connected = false;
+  client_info = new ClientInfo();
+  
   try
   {
     timeout.set_sec(500000);
@@ -34,7 +36,6 @@ LINA::Client::Client(const std::string& uri)
     Netxx::SockOpt sockopt(stream_client->get_socketfd());
     sockopt.set_non_blocking();
     connected = true;
-    client_info = new ClientInfo();
     SendClientInfo();
   }
   catch (std::exception &e)
@@ -69,6 +70,7 @@ void LINA::Client::ConnectTo(const std::string &uri)
     Netxx::SockOpt sockopt(stream_client->get_socketfd());
     sockopt.set_non_blocking();
     connected = true;
+    SendClientInfo();
   }
   catch (std::exception &e)
   {
@@ -79,6 +81,7 @@ void LINA::Client::ConnectTo(const std::string &uri)
 LINA::Client::~ Client()
 {
   Disconnect();
+  delete client_info;
 }
 
 int LINA::Client::ReceivePackage(LINA::NetPackage& net_package)
@@ -108,8 +111,10 @@ void LINA::Client::SetClientInfo(std::string nick)
 if(!connected)
 return;
 
+
   client_info->SetNickname(nick);
   SendClientInfo();
+
 }
 
 void LINA::Client::HandleClientInfo(const LINA::NetPackage& netpackage)

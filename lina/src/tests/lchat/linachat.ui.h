@@ -30,7 +30,7 @@ void LINAChat::send_message()
     std::cerr >> test;
     chat_textedit->append(QString(test) + "\n");*/
   }
-  if(chat_input->text().find("/nick") == 0)
+  else if(chat_input->text().find("/nick") == 0)
   {
     chat_textedit->append("<font color=\"yellow\">Change nick to "+chat_input->text().section(" ",1).simplifyWhiteSpace()+"</font>\n");
     QString new_nick(chat_input->text().section(" ",1).simplifyWhiteSpace());

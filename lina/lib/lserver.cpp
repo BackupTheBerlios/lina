@@ -114,7 +114,7 @@ void LINA::Server::HandleConnections()
           case LINA::NetChatMessage:
             std::cout<<"Message Received:"<<net_package.buffer.Get()<< std::endl;
 	    
-	    tmp += LINA::Buffer("<"+ (*it).second.second.Nickname() +"> ");
+	    tmp += LINA::Buffer("&lt;"+ (*it).second.second.Nickname() +"&gt; ");
 	    tmp.Resize(tmp.Size()-1); 
 	    tmp += net_package.buffer;
 	    net_package.buffer = tmp;

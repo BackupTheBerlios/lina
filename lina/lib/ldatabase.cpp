@@ -152,7 +152,7 @@ const string LINA::Database::Read(const LINA::ID& lid,const string& key) const
     string line;
     string data;
     bool multiline = false;
-    for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != '\0' ; )
+    for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != Z_NULL ; )
     {
       line=tmpline;
       line.erase(line.length()-1);
@@ -196,7 +196,7 @@ void LINA::Database::Read(const LINA::ID& lid,const string& key, string& value) 
 
     string line;
     bool multiline = false;
-    for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != '\0' ; )
+    for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != Z_NULL ; )
     {
       line=tmpline;
       line.erase(line.length()-1);
@@ -238,7 +238,7 @@ void LINA::Database::Read(const LINA::ID& lid,const string& key, stringstream& v
     string tmp;
     string line;
     bool multiline = false;
-    for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != '\0' ; )
+    for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != Z_NULL ; )
     {
       line=tmpline;
       line.erase(line.length()-1);
@@ -317,7 +317,7 @@ int LINA::Database::GetKeys(const LINA::ID& lid, set<string>& key_set) const
       string line;
       string data;
       bool multiline = false;
-      for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != '\0' ; )
+      for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != Z_NULL ; )
       {
         line=tmpline;
         string::size_type pos = line.find(":",0);
@@ -349,7 +349,7 @@ void LINA::Database::ReadPlainText(const LINA::ID& lid, std::string& text) const
 
     const short int MAXLINESIZE = 1024;
 
-    for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != '\0' ; )
+    for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != Z_NULL ; )
     {
       text += tmpline;
     }
@@ -372,7 +372,7 @@ void LINA::Database::Erase(const LINA::ID& lid,const string& key) const
     string data;
     bool multiline = false;
     bool clean = false;
-    for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != '\0' ; )
+    for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != Z_NULL ; )
     {
       line=tmpline;
       if(!clean)
@@ -546,7 +546,7 @@ void LINA::Database::Clean(const LINA::ID& lid) const
   vector<string> keys;
   vector<string> values;
   int cnt=0;
-  for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != '\0' ; )
+  for (char tmpline[MAXLINESIZE]; gzgets(file,tmpline,MAXLINESIZE) != Z_NULL ; )
   {
     line=tmpline;
     string::size_type pos = line.find(":",0);
