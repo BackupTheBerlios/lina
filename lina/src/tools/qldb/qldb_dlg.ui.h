@@ -63,16 +63,16 @@ void QLDB::open_LID( QListViewItem* item )
     db.AddRoot(root.path().latin1());
 
     std::vector<string> keys;
-    table->setNumRows(db.GetKeys(LID(item->parent()->text(0),item->text(0).latin1()),keys));
+    table->setNumRows(db.GetKeys(LID(item->parent()->text(0).latin1(),item->text(0).latin1()),keys));
     int i=0;
     for(vector<string>::iterator it = keys.begin(); it != keys.end(); ++it,++i)
     {
       //insert the key into the table
-      table->setItem( i, 0, new QTableItem( table, QTableItem::WhenCurrent, (*it) ));
+      table->setItem( i, 0, new QTableItem( table, QTableItem::WhenCurrent, (*it).c_str() ));
 
       //read the key's value array and assign it to value_vector
       vector<string> value_vector;
-      db.ReadArray(LID(item->parent()->text(0),item->text(0).latin1()),(*it),value_vector);
+      db.ReadArray(LID(item->parent()->text(0).latin1(),item->text(0).latin1()),(*it),value_vector);
       int y=1;
       for(vector<string>::iterator s_it = value_vector.begin(); s_it != value_vector.end(); ++s_it,++y)
       {
@@ -82,7 +82,7 @@ void QLDB::open_LID( QListViewItem* item )
           table->insertColumns(table->numCols());
         }
 	//insert the value into the table
-        table->setItem( i, y, new QTableItem( table, QTableItem::WhenCurrent, (*s_it) ));
+        table->setItem( i, y, new QTableItem( table, QTableItem::WhenCurrent, (*s_it).c_str() ));
       }
 
       table->adjustRow(i);
@@ -93,10 +93,10 @@ void QLDB::open_LID( QListViewItem* item )
     }
 
     //label_LID shows wich LID is currently open
-    label_LID->setText("LID - Catalog: "+item->parent()->text(0)+" Token: "+item->text(0).latin1());
+    label_LID->setText("LID - Catalog: "+item->parent()->text(0)+" Token: "+item->text(0));
     //update current_LID
     delete current_LID;
-    current_LID = new LID(item->parent()->text(0),item->text(0).latin1());
+    current_LID = new LID(item->parent()->text(0).latin1(),item->text(0).latin1());
   }
 }
 
