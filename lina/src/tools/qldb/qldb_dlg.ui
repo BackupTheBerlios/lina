@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>656</width>
-            <height>473</height>
+            <width>708</width>
+            <height>491</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -27,14 +27,6 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <widget class="QPushButton" row="0" column="8">
-            <property name="name">
-                <cstring>button_open_database_root</cstring>
-            </property>
-            <property name="text">
-                <string>Open database root</string>
-            </property>
-        </widget>
         <widget class="QPushButton" row="0" column="0">
             <property name="name">
                 <cstring>button_new_LID</cstring>
@@ -43,45 +35,50 @@
                 <string>New LID</string>
             </property>
         </widget>
-        <widget class="QSpinBox" row="0" column="6">
+        <widget class="QPushButton" row="0" column="1" rowspan="1" colspan="2">
             <property name="name">
-                <cstring>spinBox_prio</cstring>
-            </property>
-            <property name="maxValue">
-                <number>2</number>
-            </property>
-        </widget>
-        <widget class="QLabel" row="0" column="4" rowspan="1" colspan="2">
-            <property name="name">
-                <cstring>textLabel1</cstring>
+                <cstring>button_save_LID</cstring>
             </property>
             <property name="text">
-                <string>Priority:</string>
+                <string>Save LID</string>
             </property>
         </widget>
-        <spacer row="0" column="3">
+        <widget class="QLabel" row="2" column="5" rowspan="1" colspan="3">
             <property name="name">
-                <cstring>spacer1</cstring>
+                <cstring>label_LID</cstring>
             </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>7</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
             </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
+            <property name="frameShape">
+                <enum>NoFrame</enum>
             </property>
-            <property name="sizeHint">
-                <size>
-                    <width>50</width>
-                    <height>20</height>
-                </size>
-            </property>
-        </spacer>
-        <widget class="QPushButton" row="0" column="7">
-            <property name="name">
-                <cstring>button_create_catalog</cstring>
+            <property name="frameShadow">
+                <enum>Plain</enum>
             </property>
             <property name="text">
-                <string>Create Catalog</string>
+                <string></string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="2" column="2" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>add_valuecol</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>0</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="text">
+                <string>Add ValueColumn</string>
             </property>
         </widget>
         <widget class="QPushButton" row="2" column="0" rowspan="1" colspan="2">
@@ -90,27 +87,6 @@
             </property>
             <property name="text">
                 <string>Add KeyRow</string>
-            </property>
-        </widget>
-        <widget class="QTable" row="1" column="0" rowspan="1" colspan="8">
-            <column>
-                <property name="text">
-                    <string>Key</string>
-                </property>
-            </column>
-            <column>
-                <property name="text">
-                    <string>Value</string>
-                </property>
-            </column>
-            <property name="name">
-                <cstring>table</cstring>
-            </property>
-            <property name="numRows">
-                <number>0</number>
-            </property>
-            <property name="numCols">
-                <number>2</number>
             </property>
         </widget>
         <widget class="QListView" row="1" column="8" rowspan="2" colspan="1">
@@ -137,46 +113,84 @@
                 </sizepolicy>
             </property>
         </widget>
-        <widget class="QPushButton" row="2" column="2" rowspan="1" colspan="3">
+        <widget class="QTable" row="1" column="0" rowspan="1" colspan="8">
+            <column>
+                <property name="text">
+                    <string>Key</string>
+                </property>
+            </column>
+            <column>
+                <property name="text">
+                    <string>Value</string>
+                </property>
+            </column>
             <property name="name">
-                <cstring>add_valuecol</cstring>
+                <cstring>table</cstring>
             </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>0</hsizetype>
-                    <vsizetype>0</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
+            <property name="numRows">
+                <number>0</number>
             </property>
-            <property name="text">
-                <string>Add ValueColumn</string>
+            <property name="numCols">
+                <number>2</number>
             </property>
         </widget>
-        <widget class="QLabel" row="2" column="5" rowspan="1" colspan="3">
+        <widget class="QPushButton" row="0" column="8">
             <property name="name">
-                <cstring>label_LID</cstring>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>7</hsizetype>
-                    <vsizetype>5</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
+                <cstring>button_open_database_root</cstring>
             </property>
             <property name="text">
-                <string></string>
+                <string>Open database root</string>
             </property>
         </widget>
-        <widget class="QPushButton" row="0" column="1" rowspan="1" colspan="2">
+        <widget class="QPushButton" row="0" column="7">
             <property name="name">
-                <cstring>button_save_LID</cstring>
+                <cstring>button_create_catalog</cstring>
             </property>
             <property name="text">
-                <string>Save LID</string>
+                <string>Create Catalog</string>
             </property>
         </widget>
+        <widget class="QSpinBox" row="0" column="6">
+            <property name="name">
+                <cstring>spinBox_prio</cstring>
+            </property>
+            <property name="maxValue">
+                <number>2</number>
+            </property>
+        </widget>
+        <widget class="QLabel" row="0" column="5">
+            <property name="name">
+                <cstring>textLabel1</cstring>
+            </property>
+            <property name="text">
+                <string>Priority:</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="0" column="3">
+            <property name="name">
+                <cstring>button_import_template</cstring>
+            </property>
+            <property name="text">
+                <string>Import template</string>
+            </property>
+        </widget>
+        <spacer row="0" column="4">
+            <property name="name">
+                <cstring>spacer1</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>20</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
     </grid>
 </widget>
 <connections>
@@ -228,6 +242,12 @@
         <receiver>qldb</receiver>
         <slot>save_LID()</slot>
     </connection>
+    <connection>
+        <sender>button_import_template</sender>
+        <signal>clicked()</signal>
+        <receiver>qldb</receiver>
+        <slot>import_template()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="local" impldecl="in implementation">qldb_dlg.ui.h</include>
@@ -235,12 +255,13 @@
 <slots>
     <slot specifier="non virtual">open_database_root()</slot>
     <slot specifier="non virtual">open_LID( QListViewItem * item )</slot>
+    <slot specifier="non virtual">save_LID()</slot>
     <slot specifier="non virtual">create_catalog()</slot>
     <slot specifier="non virtual">set_prio( int )</slot>
     <slot specifier="non virtual">new_LID()</slot>
     <slot specifier="non virtual">add_key_row()</slot>
     <slot specifier="non virtual">add_value_column()</slot>
-    <slot specifier="non virtual">save_LID()</slot>
+    <slot>import_template()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
