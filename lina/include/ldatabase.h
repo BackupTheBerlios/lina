@@ -33,7 +33,7 @@
 #include <set>
 #include <cstdio>
 #include <cerrno>
-#include <lconvertor.h>
+#include <lconvert.h>
 
 /// LINA ID
 /** This class stores a unique ID,
