@@ -75,20 +75,17 @@ bool operator==(const LID& lhs, const LID& rhs);
 enum LDBPrio{low,mid,high};
 
 /// Pair for a database root and its priority.
-typedef pair<string,LDBPrio> LDBPair;
-
-// Compare structure for LDBPair.
-// Necessary to be able to avoid double priorities.
-struct LDBPairComp
+struct LDBPair
 {
-  bool operator()(const LDBPair& lhs, const LDBPair& rhs)
-  {
-    return (lhs.second > rhs.second);
-  }
+LDBPair(const string& p_first, const LDBPrio& p_second) : first(p_first),second(p_second) {};
+string first;
+LDBPrio second;
+friend bool operator<(const LDBPair& lhs, const LDBPair& rhs);
+friend bool operator>(const LDBPair& lhs, const LDBPair& rhs);
 };
 
 /// Set of LDBPair.
-typedef set<LDBPair, LDBPairComp> LDBPairSet;
+typedef set<LDBPair> LDBPairSet;
 
 /// LINA Database
 /** This object can do several actions with a database,

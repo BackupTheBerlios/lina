@@ -20,6 +20,9 @@
 
 #include <ldatabase.h>
 
+bool operator<(const LDBPair& lhs, const LDBPair& rhs) { return ( lhs.second > rhs.second); };
+bool operator>(const LDBPair& lhs, const LDBPair& rhs) { return ( lhs.second < rhs.second); };
+
 bool operator==(const LID& lhs, const LID& rhs)
 {
   return (lhs.Catalog() == rhs.Catalog() && lhs.Token() == rhs.Token() );
