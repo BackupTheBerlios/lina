@@ -6,4 +6,4 @@ lib_LIBRARIES = liblina.a
 
 
 
-liblina_a_SOURCES =  ldatabase.cpp
+liblina_a_SOURCES = ldatabase.cpp lcalendar.cpp lutility.cpp
