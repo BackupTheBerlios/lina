@@ -22,7 +22,11 @@ LID* current_LID=NULL;
 void QLDB::open_database_root()
 {
   //get a existing Directory and assign it to root
+  QDir old_root = root;
   root = QFileDialog::getExistingDirectory();
+
+  if(!root.path().isEmpty())
+  {
 
   //Clear all database-roots
   LDB.Clear();
@@ -56,7 +60,14 @@ void QLDB::open_database_root()
   priofile.open( IO_ReadOnly );
   int prio = priofile.getch() - 48;
   priofile.close();
+
   spinBox_prio->setValue(prio);
+  LDB.SetWriteFlag(static_cast<LDBPrio>(prio));
+  }
+  else
+  {
+  root = old_root;
+  }
 }
 
 void QLDB::open_LID( QListViewItem* item )
@@ -86,7 +97,7 @@ void QLDB::open_LID( QListViewItem* item )
         {
           table->insertColumns(table->numCols());
         }
-	//insert the value into the table
+        //insert the value into the table
         table->setItem( i, y, new QTableItem( table, QTableItem::WhenCurrent, (*s_it).c_str() ));
       }
 
@@ -125,7 +136,7 @@ void QLDB::save_LID()
           }
         }
 
-	//write the array of the current key to the LID
+        //write the array of the current key to the LID
         LDB.WriteArray(*current_LID,table->text(i,0).latin1(),value_vector);
       }
     }
@@ -139,9 +150,9 @@ void QLDB::create_catalog()
   //make sure the user set a name
   if(!catalog_name.isEmpty())
   {
-  //create the directory for the new catalog
-  //and insert it in the right place on the
-  //QListView
+    //create the directory for the new catalog
+    //and insert it in the right place on the
+    //QListView
     QDir(root.path()).mkdir(catalog_name);
     new QListViewItem(listView,catalog_name);
   }
@@ -149,17 +160,17 @@ void QLDB::create_catalog()
 
 void QLDB::set_prio( int )
 {
-//make sure a root is set
-if(root.path().length())
-{
-  QFile prio(root.path()+"/prio");
-  //open the prio file for writing
-  prio.open( IO_WriteOnly );
-  //put the priority into it
-  prio.putch(spinBox_prio->value() + 48);
-  //close
-  prio.close();
-}
+  //make sure a root is set
+  if(root.path().length())
+  {
+    QFile prio(root.path()+"/prio");
+    //open the prio file for writing
+    prio.open( IO_WriteOnly );
+    //put the priority into it
+    prio.putch(spinBox_prio->value() + 48);
+    //close
+    prio.close();
+  }
 }
 
 void QLDB::new_LID()
@@ -207,12 +218,62 @@ void QLDB::new_LID()
 
 void QLDB::add_key_row()
 {
-//simply insert a new row at the last row
+  //simply insert a new row at the last row
   table->insertRows(table->numRows());
 }
 
 void QLDB::add_value_column()
 {
-//simply insert a new column at the last column
+  //simply insert a new column at the last column
   table->insertColumns(table->numCols());
+}
+
+
+void QLDB::import_template()
+{
+  if(!root.path().isEmpty() && current_LID != NULL )
+  {
+    QString filename = QFileDialog::getOpenFileName(
+                         root.path()+"/templates/",
+                         QString::null,
+                         this,
+                         "Import template dialog",
+                         "Choose a template to import" );
+    if(filename != QString::null)
+    {
+    QFileInfo fi(filename);
+    filename = fi.fileName();
+    LID template_LID("templates",filename);
+
+    std::set<string> keys;
+    int i=table->numRows();
+    table->setNumRows(table->numRows() + LDB.GetKeys(template_LID,keys));
+    for(set<string>::iterator it = keys.begin(); it != keys.end(); ++it,++i)
+    {
+      //insert the key into the table
+      table->setItem( i, 0, new QTableItem( table, QTableItem::WhenCurrent, (*it).c_str() ));
+
+      //read the key's value array and assign it to value_vector
+      vector<string> value_vector;
+      LDB.ReadArray(template_LID,(*it),value_vector);
+      int y=1;
+      for(vector<string>::iterator s_it = value_vector.begin(); s_it != value_vector.end(); ++s_it,++y)
+      {
+        //do we have enough columns
+        if(table->numCols() <= y)
+        {
+          table->insertColumns(table->numCols());
+        }
+        //insert the value into the table
+        table->setItem( i, y, new QTableItem( table, QTableItem::WhenCurrent, (*s_it).c_str() ));
+      }
+
+      table->adjustRow(i);
+    }
+    for(int i=0; i<table->numCols();++i)
+    {
+      table->adjustColumn(i);
+    }
+   }
+  }
 }
