@@ -8,7 +8,7 @@ AC_PROG_CXX
 AM_PROG_LIBTOOL
 AM_CONDITIONAL(WANT_QLDB, test "$enable_qldb" = "yes")
 AC_ARG_ENABLE(qldb,
-[--enable-qldb          enable QLDB [[default=no]]],
+[  --enable-qldb    enable QLDB [[default=no]]],
 [case $enableval in
 yes|no) ;;
 *) AC_MSG_ERROR([bad value $enableval for --enable-qldb, need yes or no]) ;;
