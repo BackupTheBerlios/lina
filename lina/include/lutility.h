@@ -86,7 +86,7 @@ public:
   T& operator*() const { return *pointee; };
 
   /// Is it NULL?
-  bool isNULL() const
+  bool IsNULL() const
   {
     if (pointee)
       return false;
