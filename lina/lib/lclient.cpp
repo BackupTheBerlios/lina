@@ -62,12 +62,19 @@ void LClient::Disconnect()
 
 void LClient::ConnectTo(std::string uri)
 {
+  try
+  {
   Disconnect();
 
-  stream_client = new Stream("localhost",lina_port);
+  stream_client = new Stream(uri.c_str(),lina_port);
   Netxx::SockOpt sockopt(stream_client->get_socketfd());
   sockopt.set_non_blocking();
   connected = true;
+  }
+  catch (std::exception &e)
+  {
+    std::cerr << e.what() << std::endl;
+  }
 }
 
 LClient::~ LClient()

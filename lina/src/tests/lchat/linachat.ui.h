@@ -20,7 +20,9 @@ void LINAChat::send_message()
 {
   if(chat_input->text().find("/server") == 0)
   {
-    QString server_to_connect(chat_input->text().section(" ",1));
+    chat_textedit->append("<font color=\"yellow\">Trying to connect to "+chat_input->text().section(" ",1).simplifyWhiteSpace()+"</font>\n");
+    QString server_to_connect(chat_input->text().section(" ",1).simplifyWhiteSpace());
+    
     client.ConnectTo(server_to_connect);
   }
   else
