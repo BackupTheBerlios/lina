@@ -49,8 +49,14 @@ LDebug("400",*int_test2);
 
 LPtr<test> struct_test(new test);
 struct_test->integer = 33;
+struct_test->longer = 0;
 LDebug("33",struct_test->integer);
 LDebug("0",struct_test->longer);
+
+LPtr<float> floating_test;
+floating_test = new float;
+*floating_test = 99;
+LDebug(99,*floating_test);
 
 return 0;
 }
