@@ -1,0 +1,139 @@
+<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<class>LINAChat</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>LINAChat</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>851</width>
+            <height>670</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>LINAChat</string>
+    </property>
+    <grid>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QTextEdit" row="1" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>chat_textedit</cstring>
+            </property>
+            <property name="paletteForegroundColor">
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+            </property>
+            <property name="paletteBackgroundColor">
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+            </property>
+            <property name="text">
+                <string></string>
+            </property>
+            <property name="wordWrap">
+                <enum>WidgetWidth</enum>
+            </property>
+        </widget>
+        <widget class="QListBox" row="1" column="2">
+            <item>
+                <property name="text">
+                    <string></string>
+                </property>
+            </item>
+            <property name="name">
+                <cstring>people_list</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>0</hsizetype>
+                    <vsizetype>7</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+        </widget>
+        <widget class="QLabel" row="0" column="1" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>textLabel2</cstring>
+            </property>
+            <property name="text">
+                <string>LINAChat</string>
+            </property>
+        </widget>
+        <widget class="QLineEdit" row="2" column="1" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>chat_input</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>1</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="paletteForegroundColor">
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+            </property>
+            <property name="paletteBackgroundColor">
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+            </property>
+        </widget>
+        <widget class="QLabel" row="2" column="0">
+            <property name="name">
+                <cstring>nickname_label</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>4</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="text">
+                <string>Nickname</string>
+            </property>
+        </widget>
+    </grid>
+</widget>
+<connections>
+    <connection>
+        <sender>chat_input</sender>
+        <signal>returnPressed()</signal>
+        <receiver>LINAChat</receiver>
+        <slot>send_message()</slot>
+    </connection>
+</connections>
+<includes>
+    <include location="local" impldecl="in implementation">linachat.ui.h</include>
+</includes>
+<slots>
+    <slot>send_message()</slot>
+    <slot>set_nick( std::string new_nick )</slot>
+    <slot>receive_messages()</slot>
+</slots>
+<functions>
+    <function>init()</function>
+    <function>set_server( std::string server )</function>
+</functions>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>
